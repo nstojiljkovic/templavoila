@@ -685,48 +685,59 @@ class tx_templavoila_htmlmarkup {
 	 */
 	function getTemplateRecord($uid,$renderType,$langUid)	{
 		if (t3lib_extMgm::isLoaded('templavoila'))	{
-			$rec = $GLOBALS['TSFE']->sys_page->checkRecord('tx_templavoila_tmplobj',$uid);
-			$parentUid = $rec['uid'];
-			$rendertype_ref = $rec['rendertype_ref'] ? $GLOBALS['TSFE']->sys_page->checkRecord('tx_templavoila_tmplobj',$rec['rendertype_ref']) : FALSE;
+			$extConfig = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
+			if ($extConfig['staticTO.']['fluidTemplateObjects']) {
+				/* @var $toRepo tx_templavoila_templateRepository */
+				$toRepo = t3lib_div::makeInstance('tx_templavoila_templateRepository');
+				$template = $toRepo->getTemplateByUid($uid, TRUE);
+				if ($template) {
+					$rec = $template->getRow();
+				}
+			}
 
-			if (is_array($rec))	{
-				if ($renderType)	{	// If print-flag try to find a proper print-record. If the lang-uid is also set, try to find a combined print/lang record, but if not found, the print rec. will take precedence.
+			if (!$rec) {
+				$rec = $GLOBALS['TSFE']->sys_page->checkRecord('tx_templavoila_tmplobj',$uid);
+				$parentUid = $rec['uid'];
+				$rendertype_ref = $rec['rendertype_ref'] ? $GLOBALS['TSFE']->sys_page->checkRecord('tx_templavoila_tmplobj',$rec['rendertype_ref']) : FALSE;
 
-						// Look up print-row for default language:
-					$printRow = $this->getTemplateRecord_query($parentUid,'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid=0');
-					if (is_array($printRow))	{
-						$rec = $printRow;
-					} elseif ($rendertype_ref) {	// Look in rendertype_ref record:
-						$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'],'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid=0');
-						if (is_array($printRow))	{
-							$rec = $printRow;
-						}
-					}
+				if (is_array($rec))	{
+					if ($renderType)	{	// If print-flag try to find a proper print-record. If the lang-uid is also set, try to find a combined print/lang record, but if not found, the print rec. will take precedence.
 
-					if ($langUid)	{	// If lang_uid is set, try to look up for current language:
-						$printRow = $this->getTemplateRecord_query($parentUid,'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid='.intval($langUid));
+							// Look up print-row for default language:
+						$printRow = $this->getTemplateRecord_query($parentUid,'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid=0');
 						if (is_array($printRow))	{
 							$rec = $printRow;
 						} elseif ($rendertype_ref) {	// Look in rendertype_ref record:
-							$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'],'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid='.intval($langUid));
+							$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'],'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid=0');
+							if (is_array($printRow))	{
+								$rec = $printRow;
+							}
+						}
+
+						if ($langUid)	{	// If lang_uid is set, try to look up for current language:
+							$printRow = $this->getTemplateRecord_query($parentUid,'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid='.intval($langUid));
+							if (is_array($printRow))	{
+								$rec = $printRow;
+							} elseif ($rendertype_ref) {	// Look in rendertype_ref record:
+								$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'],'AND rendertype=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($renderType, 'tx_templavoila_tmplobj') . ' AND sys_language_uid='.intval($langUid));
+								if (is_array($printRow))	{
+									$rec = $printRow;
+								}
+							}
+						}
+					} elseif ($langUid)	{	// If the language uid is set, then try to find a regular record with sys_language_uid
+						$printRow = $this->getTemplateRecord_query($parentUid, 'AND rendertype=\'\' AND sys_language_uid=' . intval($langUid));
+						if (is_array($printRow))	{
+							$rec = $printRow;
+						} elseif ($rendertype_ref) {	// Look in rendertype_ref record:
+							$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'], 'AND rendertype=\'\' AND sys_language_uid=' . intval($langUid));
 							if (is_array($printRow))	{
 								$rec = $printRow;
 							}
 						}
 					}
-				} elseif ($langUid)	{	// If the language uid is set, then try to find a regular record with sys_language_uid
-					$printRow = $this->getTemplateRecord_query($parentUid, 'AND rendertype=\'\' AND sys_language_uid=' . intval($langUid));
-					if (is_array($printRow))	{
-						$rec = $printRow;
-					} elseif ($rendertype_ref) {	// Look in rendertype_ref record:
-						$printRow = $this->getTemplateRecord_query($rendertype_ref['uid'], 'AND rendertype=\'\' AND sys_language_uid=' . intval($langUid));
-						if (is_array($printRow))	{
-							$rec = $printRow;
-						}
-					}
 				}
 			}
-
 			return $rec;
 		}
 		return false;

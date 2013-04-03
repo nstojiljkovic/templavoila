@@ -704,7 +704,9 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 		}
 
 		$mappingStatus = $mappingStatus_index = '';
-		if ($fileMtime && $toObj->getFilerefMtime()) {
+		if ($toObj->isStatic()) {
+			$mappingStatus.= $GLOBALS['LANG']->getLL('mapping_not_available', 1);
+		} elseif ($fileMtime && $toObj->getFilerefMtime()) {
 			if ($toObj->getFilerefMD5() != '') {
 				$modified = (@md5_file($fileReference) != $toObj->getFilerefMD5());
 			} else {
@@ -766,7 +768,7 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 					<td colspan="3">'.
 						$recordIcon.
 						$toTitle.
-						$editLink.
+						($toObj->isStatic() ?  ' <strong>FLUID</strong>' : $editLink).
 						'</td>
 				</tr>
 				<tr class="bgColor4">
@@ -785,9 +787,9 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 				<tr class="bgColor4">
 					<td>' . $GLOBALS['LANG']->getLL('localprocessing_xml') . ':</td>
 					<td>
-						'.$lpXML.($toObj->getLocalDataprotXML(TRUE) ?
+						'.($toObj->isStatic() ? $toObj->getLocalDataproXMLLocation() : $lpXML.($toObj->getLocalDataprotXML(TRUE) ?
 						t3lib_div::formatSize(strlen($toObj->getLocalDataprotXML(TRUE))).' bytes'.
-						($this->MOD_SETTINGS['set_details'] ? '<hr/>'.$XMLinfo['HTML'] : '') : '').'
+						($this->MOD_SETTINGS['set_details'] ? '<hr/>'.$XMLinfo['HTML'] : '') : '')).'
 					</td>
 				</tr>'.($this->MOD_SETTINGS['set_details'] ? '
 				<tr class="bgColor4">

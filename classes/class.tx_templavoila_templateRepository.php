@@ -30,13 +30,43 @@
 class tx_templavoila_templateRepository {
 
 	/**
+	 * @var bool
+	 */
+	protected $enableFluidTemplateObjects = FALSE;
+
+	public function __construct() {
+		$extConfig = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
+		$this->enableFluidTemplateObjects = (bool) $extConfig['staticTO.']['fluidTemplateObjects'];
+	}
+
+	/**
 	 * Retrieve a single templateobject by uid or xml-file path
 	 *
 	 * @param integer $uid
 	 * @return tx_templavoila_template
 	 */
-	public function getTemplateByUid($uid) {
-		return t3lib_div::makeInstance('tx_templavoila_template', $uid);
+	public function getTemplateByUid($uid, $tsOnly = FALSE) {
+		$result = null;
+
+		if ($this->enableFluidTemplateObjects) {
+			$tsData = $this->loadTSTOSettings(0);
+			foreach($tsData as $key => $templateConfiguration) {
+				if ($uid==rtrim($key, '.')) {
+					$templateConfiguration['uid'] = rtrim($key, '.');
+					$templateConfiguration['type'] = 'static';
+					$result = t3lib_div::makeInstance('tx_templavoila_template', $templateConfiguration);
+					break;
+				}
+			}
+		}
+		if (!$result && !$tsOnly) {
+			$row = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $uid);
+			if ($row) {
+				$result = t3lib_div::makeInstance('tx_templavoila_template', $row);
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -47,6 +77,21 @@ class tx_templavoila_templateRepository {
 	 * @return array
 	 */
 	public function getTemplatesByDatastructure(tx_templavoila_datastructure $ds, $storagePid = 0) {
+		$toCollection = array();
+
+		if ($this->enableFluidTemplateObjects) {
+				// fetch template objects from TypoScript
+			$tsData = $this->loadTSTOSettings($storagePid);
+			foreach($tsData as $key => $templateConfiguration) {
+				if ($ds->getKey()==$templateConfiguration['datastructure']) {
+					$templateConfiguration['uid'] = rtrim($key, '.');
+					$templateConfiguration['type'] = 'static';
+					$toCollection[$templateConfiguration['uid']] = t3lib_div::makeInstance('tx_templavoila_template', $templateConfiguration);
+				}
+			}
+		}
+
+			// fetch template objects from DB
 		$toList = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows (
 			'tx_templavoila_tmplobj.uid',
 			'tx_templavoila_tmplobj',
@@ -56,9 +101,10 @@ class tx_templavoila_templateRepository {
 				. ' AND pid!=-1 '
 				. t3lib_BEfunc::versioningPlaceholderClause('tx_templavoila_tmplobj')
 		);
-		$toCollection = array();
 		foreach ($toList as $toRec) {
-			$toCollection[] = $this->getTemplateByUid($toRec['uid']);
+			if (!$toCollection[$toRec['uid']]) {
+				$toCollection[$toRec['uid']] = $this->getTemplateByUid($toRec['uid']);
+			}
 		}
 		usort($toCollection, array($this, 'sortTemplates'));
 		return $toCollection;
@@ -90,6 +136,21 @@ class tx_templavoila_templateRepository {
 	 * @return array
 	 */
 	public function getTemplatesByParentTemplate(tx_templavoila_template $to, $storagePid=0) {
+		$toCollection = array();
+
+		if ($this->enableFluidTemplateObjects) {
+				// fetch template objects from TypoScript
+			$tsData = $this->loadTSTOSettings($storagePid);
+			foreach($tsData as $key => $templateConfiguration) {
+				if ($to->getKey()==$templateConfiguration['parent']) {
+					$templateConfiguration['uid'] = rtrim($key, '.');
+					$templateConfiguration['type'] = 'static';
+					$toCollection[$templateConfiguration['uid']] = t3lib_div::makeInstance('tx_templavoila_template', $templateConfiguration);
+				}
+			}
+		}
+
+			// fetch template objects from DB
 		$toList = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows (
 			'tx_templavoila_tmplobj.uid',
 			'tx_templavoila_tmplobj',
@@ -98,9 +159,10 @@ class tx_templavoila_templateRepository {
 				. t3lib_BEfunc::deleteClause('tx_templavoila_tmplobj')
 				. t3lib_BEfunc::versioningPlaceholderClause('tx_templavoila_tmplobj')
 		);
-		$toCollection = array();
 		foreach ($toList as $toRec) {
-			$toCollection[] = $this->getTemplateByUid($toRec['uid']);
+			if (!$toCollection[$toRec['uid']]) {
+				$toCollection[$toRec['uid']] = $this->getTemplateByUid($toRec['uid']);
+			}
 		}
 		usort($toCollection, array($this, 'sortTemplates'));
 		return $toCollection;
@@ -112,6 +174,19 @@ class tx_templavoila_templateRepository {
 	 * @return array
 	 */
 	public function getAll($storagePid=0) {
+		$toCollection = array();
+
+		if ($this->enableFluidTemplateObjects) {
+				// fetch template objects from TypoScript
+			$tsData = $this->loadTSTOSettings($storagePid);
+			foreach($tsData as $key => $templateConfiguration) {
+				$templateConfiguration['uid'] = rtrim($key, '.');
+				$templateConfiguration['type'] = 'static';
+				$toCollection[$templateConfiguration['uid']] = t3lib_div::makeInstance('tx_templavoila_template', $templateConfiguration);
+			}
+		}
+
+			// fetch template objects from DB
 		$toList = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows (
 			'tx_templavoila_tmplobj.uid',
 			'tx_templavoila_tmplobj',
@@ -122,7 +197,9 @@ class tx_templavoila_templateRepository {
 		);
 		$toCollection = array();
 		foreach ($toList as $toRec) {
-			$toCollection[] = $this->getTemplateByUid($toRec['uid']);
+			if (!$toCollection[$toRec['uid']]) {
+				$toCollection[$toRec['uid']] = $this->getTemplateByUid($toRec['uid']);
+			}
 		}
 		usort($toCollection, array($this, 'sortTemplates'));
 		return $toCollection;
@@ -147,6 +224,7 @@ class tx_templavoila_templateRepository {
 	 * @return array
 	 */
 	public function getTemplateStoragePids() {
+		// @todo: implement me
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					'pid',
 					'tx_templavoila_tmplobj',
@@ -166,6 +244,7 @@ class tx_templavoila_templateRepository {
 	 * @return integer
 	 */
 	public function getTemplateCountForPid($pid) {
+		// @todo: implement me
 		$toCnt = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 					'count(*) as cnt',
 					'tx_templavoila_tmplobj',
@@ -174,6 +253,145 @@ class tx_templavoila_templateRepository {
 		return $toCnt[0]['cnt'];
 	}
 
+	/**
+	 * @var array
+	 */
+	protected $tsCache = array();
+
+	/**
+	 * Loads the TypoScript for a page
+	 *
+	 * @param int $pageUid
+	 * @return array The TypoScript setup
+	 */
+	function loadTSTOSettings($pageUid) {
+		if (TYPO3_MODE=='FE' && $GLOBALS['TSFE']) {
+			return $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
+		} elseif (!$this->tsCache[$pageUid]) {
+			if ($pageUid==0) {
+				$globalTemplatesConf = array();
+
+				foreach ($this->getAllTypoScriptRecordPids() as $pid) {
+					$ts = $this->loadTSFE($pid);
+					$tsConfiguration = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
+
+					foreach($tsConfiguration as $toKey => $toConf) {
+						if (!$globalTemplatesConf[$toKey]) {
+							$globalTemplatesConf[$toKey] = $toConf;
+						} else {
+							$diff = $this->array_diff_recursive($globalTemplatesConf[$toKey], $toConf);
+							if (count($diff)>0) {
+								throw new Tx_IndexerAdapter_Exception_InvalidConfigurationException(sprintf('TypoScript configuration for indexer_adapter configuration "%s" is different on pages with uids %s and %s. This is not allowed!', $toKey, $pid, $uniqueTSRegistrationPids[$toKey]), 9776234);
+							}
+						}
+					}
+
+				}
+
+				$this->tsCache[$pageUid] = $globalTemplatesConf;
+			} else {
+				$ts = $this->loadTSFE($pageUid);
+				$this->tsCache[$pageUid] = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'];
+			}
+		}
+
+		return $this->tsCache[$pageUid] ? $this->tsCache[$pageUid] : array();
+	}
+
+	/**
+	 * Filters keys off from first array that also exist in second array. Comparison is done by keys and values.
+	 * This method is a recursive version of php array_diff()
+	 *
+	 * @param array $array1 Source array
+	 * @param array $array2 Reduce source array by this array
+	 * @return array Source array reduced by keys also present in second array
+	 */
+	protected function array_diff_recursive(array $array1, array $array2) {
+
+		$differenceArray = array();
+		foreach ($array1 as $key => $value) {
+			if (!array_key_exists($key, $array2)) {
+				$differenceArray[$key] = $value;
+			} elseif (is_array($value)) {
+				if (is_array($array2[$key])) {
+					$diff = self::array_diff_recursive($value, $array2[$key]);
+					if (count($diff)>0) {
+						$differenceArray[$key] = $diff;
+					}
+				}
+			}
+		}
+		foreach ($array2 as $key => $value) {
+			if (!array_key_exists($key, $differenceArray)) {
+				if (!array_key_exists($key, $array1)) {
+					$differenceArray[$key] = $value;
+				} elseif (is_array($value)) {
+					if (is_array($array1[$key])) {
+						$diff = self::array_diff_recursive($value, $array1[$key]);
+						if (count($diff)>0) {
+							$differenceArray[$key] = $diff;
+						}
+					}
+				}
+			}
+		}
+
+		return $differenceArray;
+	}
+
+	/**
+	 * Returns an array of all pids where sys_template records are stored
+	 *
+	 * @return array
+	 */
+	protected function getAllTypoScriptRecordPids() {
+		$result = array();
+
+		$table = 'sys_template';
+
+		$enableFields = t3lib_BEfunc::BEenableFields ( $table );
+		if (trim($enableFields) == 'AND') {
+			$enableFields = '';
+		}
+		$enableFields .= t3lib_BEfunc::deleteClause($table);
+
+		// pid > 0 makes sure we don't get any draft workspace records
+		$res = $this->getDatabase()->exec_SELECTquery('*','sys_template','pid > 0'.$enableFields);
+		while ($res && $row = $this->getDatabase()->sql_fetch_assoc($res)) {
+			$result[] = $row['pid'];
+		}
+		$this->getDatabase()->sql_free_result($res);
+
+		return $result;
+	}
+
+	/**
+	 * Loads the TypoScript for a page
+	 *
+	 * @param int $pageUid
+	 * @return array The TypoScript setup
+	 */
+	protected function loadTSFE($pageUid) {
+		$sysPageObj = t3lib_div::makeInstance('t3lib_pageSelect');
+		$rootLine = $sysPageObj->getRootLine($pageUid);
+		$TSObj = t3lib_div::makeInstance('t3lib_tsparser_ext');
+		$TSObj->tt_track = 0;
+		$TSObj->init();
+		$TSObj->runThroughTemplates($rootLine);
+		$TSObj->generateConfig();
+		return $TSObj->setup;
+	}
+
+	/**
+	 * Get the database object
+	 *
+	 * @access protected
+	 * @see t3lib_db
+	 * @return t3lib_db
+	 */
+	protected function getDatabase() {
+		return $GLOBALS['TYPO3_DB'];
+	}
 }
 
 

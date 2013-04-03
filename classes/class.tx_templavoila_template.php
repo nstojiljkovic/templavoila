@@ -23,7 +23,7 @@
 ***************************************************************/
 
 /**
- * Class to provide unique access to datastructure
+ * Class to provide unique access to template object
  *
  * @author	Tolleiv Nietsch <tolleiv.nietsch@typo3.org>
  */
@@ -40,11 +40,16 @@ class tx_templavoila_template {
 	protected $parent;
 
 	/**
+	 * Constructor
 	 *
-	 * @param integer $uid
+	 * @param mixed $row
 	 */
-	public function __construct($uid) {
-		$this->row = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $uid);
+	public function __construct($row) {
+		if (is_array($row)) {
+			$this->row = $row;
+		} else {
+			$this->row = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $row);
+		}
 
 		$this->setLabel($this->row['title']);
 		$this->setDescription($this->row['description']);
@@ -98,11 +103,7 @@ class tx_templavoila_template {
 	 * @return string
 	 */
 	public function getIcon() {
-		$icon = '';
-		if ($this->iconFile) {
-			$icon = '../uploads/tx_templavoila/' . $this->iconFile;
-		}
-		return $icon;
+		return $this->iconFile;
 	}
 
 	/**
@@ -111,7 +112,9 @@ class tx_templavoila_template {
 	 * @return void
 	 */
 	protected function setIcon($filename) {
-		$this->iconFile = $filename;
+		if ($filename) {
+			$this->iconFile = $this->isStatic() ? ('../' . str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($filename))) : ('../uploads/tx_templavoila/' . $filename);
+		}
 	}
 
 	/**
@@ -295,6 +298,13 @@ class tx_templavoila_template {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getLocalDataproXMLLocation() {
+		return $this->isStatic() ? $this->row['localprocessing'] : '';
+	}
+
+	/**
 	 * @param boolean $skipDsDataprot
 	 * @return array
 	 */
@@ -304,7 +314,14 @@ class tx_templavoila_template {
 		} else {
 			$dataprot = array();
 		}
-		$toDataprot =  t3lib_div::xml2array($this->row['localprocessing']);
+		if ($this->isStatic()) {
+			if ($this->row['localprocessing']) {
+				$localprocessingFilePath = t3lib_div::xml2array(t3lib_div::getUrl($this->row['localprocessing']));
+				$toDataprot =  t3lib_div::xml2array($localprocessingFilePath);
+			}
+		} else {
+			$toDataprot =  t3lib_div::xml2array($this->row['localprocessing']);
+		}
 
 		if (is_array($toDataprot)) {
 			$dataprot = t3lib_div::array_merge_recursive_overrule($dataprot, $toDataprot);
@@ -383,8 +400,25 @@ class tx_templavoila_template {
 		return $this->parent;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function hasParent() {
 		return $this->parent > 0;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRow() {
+		return $this->row;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isStatic() {
+		return (bool) $this->row['type'] == 'static';
 	}
 }
 

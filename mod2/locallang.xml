@@ -29,6 +29,7 @@
 			<label index="showuused">Show unused datastructures</label>
 			<label index="containerstatus">Container status</label>
 			<label index="mappingstatus">Mapping status</label>
+			<label index="mapping_not_available">Mapping info not available. This is a static Fluid template object.</label>
 			<label index="usagecount">Usage Count</label>
 			<label index="templatestatus">Template Status</label>
 			<label index="rendertype">Render Type</label>

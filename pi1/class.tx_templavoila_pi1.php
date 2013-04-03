@@ -299,26 +299,50 @@ class tx_templavoila_pi1 extends tslib_pibase {
 					// Get Template Object record:
 				$TOrec = $this->markupObj->getTemplateRecord($row['tx_templavoila_to'], $renderType, $GLOBALS['TSFE']->sys_language_uid);
 				if (is_array($TOrec))	{
+					if ($TOrec['type']=='static') {
+						$fluidTemplateFilePath = t3lib_div::getFileAbsFileName($TOrec['fileref']);
 
-						// Get mapping information from Template Record:
-					$TO = unserialize($TOrec['templatemapping']);
-					if (is_array($TO))	{
+						if (@file_exists($fluidTemplateFilePath)) {
+							/**
+							 * 1. initializing Fluid StandaloneView and setting configuration parameters
+							 **/
+							$view = t3lib_div::makeInstance('Tx_Fluid_View_StandaloneView');
+							$view->setTemplatePathAndFilename($fluidTemplateFilePath);
 
+							// override the default layout path via typoscript
+							// $view->setLayoutRootPath($layoutRootPath);
+
+							// override the default partials path via typoscript
+							// $view->setPartialRootPath($partialRootPath);
+
+							// override the default format
+							// $view->setFormat($format);
+
+							// set some default variables for initializing Extbase
+							// $view->getRequest()->setPluginName($requestPluginName);
+							// $view->getRequest()->setControllerExtensionName($requestControllerExtensionName);
+							// $view->getRequest()->setControllerName($requestControllerName);
+							//	$view->getRequest()->setControllerActionName($requestControllerActionName);
+
+							/**
+							 * 2. variable assignment
+							 */
 							// Get local processing:
-						$TOproc = array();
-						if ($TOrec['localprocessing']) {
-							$TOproc = t3lib_div::xml2array($TOrec['localprocessing']);
-							if (!is_array($TOproc))	{
-								// Must be a error!
-								// TODO log to TT the content of $TOproc (it is a error message now)
-								$TOproc = array();
+							$TOproc = array();
+							if ($TOrec['localprocessing']) {
+								$localprocessingFilePath = t3lib_div::getFileAbsFileName($TOrec['localprocessing']);
+								$TOproc =  t3lib_div::xml2array(t3lib_div::getUrl($localprocessingFilePath));
+								if (!is_array($TOproc))	{
+									// Must be a error!
+									// TODO log to TT the content of $TOproc (it is a error message now)
+									$TOproc = array();
+								}
 							}
-						}
 							// Processing the data array:
-						if ($GLOBALS['TT']->LR) $GLOBALS['TT']->push('Processing data');
+							if ($GLOBALS['TT']->LR) $GLOBALS['TT']->push('Processing data');
 							$vKey = ($GLOBALS['TSFE']->sys_language_isocode && !$langDisabled && $langChildren) ? 'v'.$GLOBALS['TSFE']->sys_language_isocode : 'vDEF';
 
-								/* Hook to modify value key - e.g. used for EXT:languagevisibility */
+							/* Hook to modify value key - e.g. used for EXT:languagevisibility */
 							foreach($hookObjectsArr as $hookObj)	{
 								if (method_exists ($hookObj, 'renderElement_preProcessValueKey')) {
 									$vKey = $hookObj->renderElement_preProcessValueKey($row, $table, $vKey, $langDisabled, $langChildren, $this);
@@ -326,11 +350,11 @@ class tx_templavoila_pi1 extends tslib_pibase {
 							}
 
 							$TOlocalProc = $singleSheet ? $TOproc['ROOT']['el'] : $TOproc['sheets'][$sheet]['ROOT']['el'];
-								// Store the original data values before the get processed.
+							// Store the original data values before the get processed.
 							$originalDataValues = $dataValues;
 							$this->processDataValues($dataValues,$dataStruct['ROOT']['el'],$TOlocalProc,$vKey, ($this->conf['renderUnmapped'] !== 'false' ? TRUE : $TO['MappingInfo']['ROOT']['el']));
 
-								// Hook: renderElement_postProcessDataValues
+							// Hook: renderElement_postProcessDataValues
 							foreach ($hookObjectsArr as $hookObj) {
 								if (method_exists($hookObj, 'renderElement_postProcessDataValues')) {
 									$flexformData = array(
@@ -344,33 +368,106 @@ class tx_templavoila_pi1 extends tslib_pibase {
 								}
 							}
 
-						if ($GLOBALS['TT']->LR) $GLOBALS['TT']->pull();
+							foreach ($dataValues as $fieldName => $fieldValue) {
+								$view->assign($fieldName, $fieldValue[$vKey]);
+							}
+							$view->assign('data', $this->cObj->data);
+							$view->assign('current', $this->cObj->data[$this->cObj->currentValKey]);
+
+							/**
+							 * 3. render the content
+							 */
+							$content = $view->render();
+
+							// Edit icon (frontend editing):
+							$eIconf = array('styleAttribute'=>'position:absolute;');
+							if ($table=='pages')	$eIconf['beforeLastTag']=-1;	// For "pages", set icon in top, not after.
+							$content = $this->pi_getEditIcon($content,'tx_templavoila_flex','Edit element',$row,$table,$eIconf);
+
+							// Visual identification aids:
+
+							$feedit = is_object($GLOBALS['BE_USER']) && method_exists($GLOBALS['BE_USER'], 'isFrontendEditingActive') && $GLOBALS['BE_USER']->isFrontendEditingActive();
+
+							if ($GLOBALS['TSFE']->fePreview && $GLOBALS['TSFE']->beUserLogin && !$GLOBALS['TSFE']->workspacePreview && !$this->conf['disableExplosivePreview'] && !$feedit)	{
+								$content = $this->visualID($content, $srcPointer, $DSrec, $TOrec, $row, $table);
+							}
+						} else {
+							$content = $this->formatError('Fluid template could not be found.
+							Are you sure you referenced an existing file in the Template Object with UID "'.$row['tx_templavoila_to'].'"?');
+						}
+					} else {
+						// Get mapping information from Template Record:
+						$TO = unserialize($TOrec['templatemapping']);
+						if (is_array($TO))	{
+
+							// Get local processing:
+							$TOproc = array();
+							if ($TOrec['localprocessing']) {
+								$TOproc = t3lib_div::xml2array($TOrec['localprocessing']);
+								if (!is_array($TOproc))	{
+									// Must be a error!
+									// TODO log to TT the content of $TOproc (it is a error message now)
+									$TOproc = array();
+								}
+							}
+							// Processing the data array:
+							if ($GLOBALS['TT']->LR) $GLOBALS['TT']->push('Processing data');
+							$vKey = ($GLOBALS['TSFE']->sys_language_isocode && !$langDisabled && $langChildren) ? 'v'.$GLOBALS['TSFE']->sys_language_isocode : 'vDEF';
+
+							/* Hook to modify value key - e.g. used for EXT:languagevisibility */
+							foreach($hookObjectsArr as $hookObj)	{
+								if (method_exists ($hookObj, 'renderElement_preProcessValueKey')) {
+									$vKey = $hookObj->renderElement_preProcessValueKey($row, $table, $vKey, $langDisabled, $langChildren, $this);
+								}
+							}
+
+							$TOlocalProc = $singleSheet ? $TOproc['ROOT']['el'] : $TOproc['sheets'][$sheet]['ROOT']['el'];
+							// Store the original data values before the get processed.
+							$originalDataValues = $dataValues;
+							$this->processDataValues($dataValues,$dataStruct['ROOT']['el'],$TOlocalProc,$vKey, ($this->conf['renderUnmapped'] !== 'false' ? TRUE : $TO['MappingInfo']['ROOT']['el']));
+
+							// Hook: renderElement_postProcessDataValues
+							foreach ($hookObjectsArr as $hookObj) {
+								if (method_exists($hookObj, 'renderElement_postProcessDataValues')) {
+									$flexformData = array(
+										'table' => $table,
+										'row'   => $row,
+										'sheet' => $renderSheet,
+										'sLang' => $lKey,
+										'vLang' => $vKey
+									);
+									$hookObj->renderElement_postProcessDataValues($DS, $dataValues, $originalDataValues, $flexformData);
+								}
+							}
+
+							if ($GLOBALS['TT']->LR) $GLOBALS['TT']->pull();
 
 							// Merge the processed data into the cached template structure:
-						if ($GLOBALS['TT']->LR) $GLOBALS['TT']->push('Merge data and TO');
-								// Getting the cached mapping data out (if sheets, then default to "sDEF" if no mapping exists for the specified sheet!)
+							if ($GLOBALS['TT']->LR) $GLOBALS['TT']->push('Merge data and TO');
+							// Getting the cached mapping data out (if sheets, then default to "sDEF" if no mapping exists for the specified sheet!)
 							$mappingDataBody = $singleSheet ? $TO['MappingData_cached'] : (is_array($TO['MappingData_cached']['sub'][$sheet]) ? $TO['MappingData_cached']['sub'][$sheet] : $TO['MappingData_cached']['sub']['sDEF']);
 							$content = $this->markupObj->mergeFormDataIntoTemplateStructure($dataValues,$mappingDataBody,'',$vKey);
 
 							$this->markupObj->setHeaderBodyParts($TO['MappingInfo_head'],$TO['MappingData_head_cached'],$TO['BodyTag_cached'], self::$enablePageRenderer);
 
-						if ($GLOBALS['TT']->LR) $GLOBALS['TT']->pull();
+							if ($GLOBALS['TT']->LR) $GLOBALS['TT']->pull();
 
 							// Edit icon (frontend editing):
-						$eIconf = array('styleAttribute'=>'position:absolute;');
-						if ($table=='pages')	$eIconf['beforeLastTag']=-1;	// For "pages", set icon in top, not after.
-						$content = $this->pi_getEditIcon($content,'tx_templavoila_flex','Edit element',$row,$table,$eIconf);
+							$eIconf = array('styleAttribute'=>'position:absolute;');
+							if ($table=='pages')	$eIconf['beforeLastTag']=-1;	// For "pages", set icon in top, not after.
+							$content = $this->pi_getEditIcon($content,'tx_templavoila_flex','Edit element',$row,$table,$eIconf);
 
 							// Visual identification aids:
 
-						$feedit = is_object($GLOBALS['BE_USER']) && method_exists($GLOBALS['BE_USER'], 'isFrontendEditingActive') && $GLOBALS['BE_USER']->isFrontendEditingActive();
+							$feedit = is_object($GLOBALS['BE_USER']) && method_exists($GLOBALS['BE_USER'], 'isFrontendEditingActive') && $GLOBALS['BE_USER']->isFrontendEditingActive();
 
-						if ($GLOBALS['TSFE']->fePreview && $GLOBALS['TSFE']->beUserLogin && !$GLOBALS['TSFE']->workspacePreview && !$this->conf['disableExplosivePreview'] && !$feedit)	{
-							$content = $this->visualID($content, $srcPointer, $DSrec, $TOrec, $row, $table);
-						}
-					} else {
-						$content = $this->formatError('Template Object could not be unserialized successfully.
+							if ($GLOBALS['TSFE']->fePreview && $GLOBALS['TSFE']->beUserLogin && !$GLOBALS['TSFE']->workspacePreview && !$this->conf['disableExplosivePreview'] && !$feedit)	{
+								$content = $this->visualID($content, $srcPointer, $DSrec, $TOrec, $row, $table);
+							}
+						} else {
+							$content = $this->formatError('Template Object could not be unserialized successfully.
 							Are you sure you saved mapping information into Template Object with UID "'.$row['tx_templavoila_to'].'"?');
+						}
 					}
 				} else {
 					$content = $this->formatError('Couldn\'t find Template Object with UID "'.$row['tx_templavoila_to'].'".
