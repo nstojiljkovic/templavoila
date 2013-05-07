@@ -293,7 +293,7 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 					$tRows[] = '
 						<tr class="bgColor4">
 							<td><a href="index.php?id=' . $pid . '" onclick="setHighlight(' . $pid . ')">' .
-							t3lib_iconWorks::getSpriteIconForRecord('pages', t3lib_BEfunc::getRecord('pages', $pid)).
+							t3lib_iconWorks::getSpriteIconForRecord('pages', tx_templavoila_befunc::getRecord('pages', $pid)).
 							htmlspecialchars($path).'</a></td>
 							<td>' . $dsRepo->getDatastructureCountForPid($pid) . '</td>
 							<td>' . $toRepo->getTemplateCountForPid($pid) . '</td>
@@ -2332,7 +2332,7 @@ lib.'.$menuType.'.1.ACT {
 	 */
 	function getMenuDefaultCode($field)	{
 			// Select template record and extract menu HTML content
-		$toRec = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$this->wizardData['templateObjectId']);
+		$toRec = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$this->wizardData['templateObjectId']);
 		$tMapping = unserialize($toRec['templatemapping']);
 		return $tMapping['MappingData_cached']['cArray'][$field];
 	}
@@ -2349,7 +2349,7 @@ lib.'.$menuType.'.1.ACT {
 		if (isset($cfg['menuCode']))	{
 
 				// Get template record:
-			$TSrecord = t3lib_BEfunc::getRecord('sys_template',$this->wizardData['typoScriptTemplateID']);
+			$TSrecord = tx_templavoila_befunc::getRecord('sys_template',$this->wizardData['typoScriptTemplateID']);
 			if (is_array($TSrecord))	{
 				$data['sys_template'][$TSrecord['uid']]['config'] = '
 

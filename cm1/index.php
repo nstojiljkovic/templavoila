@@ -588,11 +588,11 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 				$sesDat = $GLOBALS['BE_USER']->getSessionData($this->sessionKey);
 			}
 			if ($this->_load_ds_xml_to) {
-				$toREC = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj', $this->_load_ds_xml_to);
+				$toREC = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', $this->_load_ds_xml_to);
 				if ($this->staticDS) {
 					$dsREC['dataprot'] = t3lib_div::getURL(t3lib_div::getFileAbsFileName($toREC['datastructure']));
 				} else {
-					$dsREC = t3lib_BEfunc::getRecordWSOL('tx_templavoila_datastructure', $toREC['datastructure']);
+					$dsREC = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_datastructure', $toREC['datastructure']);
 				}
 			}
 
@@ -811,14 +811,14 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 
 					if ($cmd == 'updateDSandTO') {
 							// Looking up the records by their uids:
-						$toREC = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$this->_saveDSandTO_TOuid);
+						$toREC = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$this->_saveDSandTO_TOuid);
 					} else {
-						$toREC = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$this->_load_ds_xml_to);
+						$toREC = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$this->_load_ds_xml_to);
 					}
 					if ($this->staticDS) {
 						$dsREC['uid'] = $toREC['datastructure'];
 					} else {
-						$dsREC = t3lib_BEfunc::getRecordWSOL('tx_templavoila_datastructure', $toREC['datastructure']);
+						$dsREC = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_datastructure', $toREC['datastructure']);
 					}
 
 						// If they are found, continue:
@@ -1145,7 +1145,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 	function renderDSO()	{
 		global $TYPO3_DB;
 		if (intval($this->displayUid)>0)	{ // TODO: static ds support
-			$row = t3lib_BEfunc::getRecordWSOL('tx_templavoila_datastructure',$this->displayUid);
+			$row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_datastructure',$this->displayUid);
 			if (is_array($row))	{
 
 					// Get title and icon:
@@ -1278,7 +1278,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 	 */
 	function renderTO()	{
 		if (intval($this->displayUid)>0)	{
-			$row = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$this->displayUid);
+			$row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$this->displayUid);
 
 			if (is_array($row))	{
 
@@ -1294,7 +1294,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 				$icon = t3lib_iconWorks::getSpriteIconForRecord('tx_templavoila_tmplobj', $row);
 
 				$title = t3lib_BEfunc::getRecordTitle('tx_templavoila_tmplobj', $row);
-				$title = t3lib_BEFunc::getRecordTitlePrep($GLOBALS['LANG']->sL($title));
+				$title = t3lib_BEfunc::getRecordTitlePrep($GLOBALS['LANG']->sL($title));
 				$tRows[]='
 					<tr class="bgColor4">
 						<td>'.$GLOBALS['LANG']->getLL('templateObject').':</td>
@@ -1329,12 +1329,12 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 					$DSOfile='';
 					$dsValue = $row['datastructure'];
 					if ($row['parent'])	{
-						$parentRec = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$row['parent'],'datastructure');
+						$parentRec = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$row['parent'],'datastructure');
 						$dsValue=$parentRec['datastructure'];
 					}
 
 					if (tx_templavoila_div::canBeInterpretedAsInteger($dsValue))	{
-						$DS_row = t3lib_BEfunc::getRecordWSOL('tx_templavoila_datastructure',$dsValue);
+						$DS_row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_datastructure',$dsValue);
 					} else {
 						$DSOfile = t3lib_div::getFileAbsFileName($dsValue);
 					}
@@ -1345,7 +1345,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 								// Get title and icon:
 							$icon = t3lib_iconWorks::getSpriteIconForRecord('tx_templavoila_datastructure',$DS_row);
 							$title = t3lib_BEfunc::getRecordTitle('tx_templavoila_datastructure', $DS_row);
-							$title = t3lib_BEFunc::getRecordTitlePrep($GLOBALS['LANG']->sL($title));
+							$title = t3lib_BEfunc::getRecordTitlePrep($GLOBALS['LANG']->sL($title));
 
 							$tRows[]='
 								<tr class="bgColor4">
@@ -1633,7 +1633,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 				t3lib_FlashMessage::OK
 			);
 			$msg[] .= $flashMessage->render();
-			$row = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$this->displayUid);
+			$row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$this->displayUid);
 			$templatemapping = unserialize($row['templatemapping']);
 
 			if (t3lib_div::_GP('_save_to_return'))	{
@@ -2457,7 +2457,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 		);
 		while(false !== ($row = $TYPO3_DB->sql_fetch_assoc($res)))	{
 			if ($GLOBALS['BE_USER']->isInWebMount($row['storage_pid'],$readPerms))	{
-				$storageFolder = t3lib_BEfunc::getRecord('pages',$row['storage_pid'],'uid,title');
+				$storageFolder = tx_templavoila_befunc::getRecord('pages',$row['storage_pid'],'uid,title');
 				if ($storageFolder['uid'])	{
 					$this->storageFolders[$storageFolder['uid']] = $storageFolder['title'];
 				}
@@ -2476,7 +2476,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 				isset($tsCconfig['properties']['storagePid']) &&
 				$GLOBALS['BE_USER']->isInWebMount($tsCconfig['properties']['storagePid'],$readPerms)
 			)	{
-				$storageFolder = t3lib_BEfunc::getRecord('pages',$tsCconfig['properties']['storagePid'],'uid,title');
+				$storageFolder = tx_templavoila_befunc::getRecord('pages',$tsCconfig['properties']['storagePid'],'uid,title');
 				if ($storageFolder['uid'])	{
 					$this->storageFolders[$storageFolder['uid']] = $storageFolder['title'];
 				}

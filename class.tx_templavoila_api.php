@@ -121,7 +121,7 @@ class tx_templavoila_api {
 	function insertElement_createRecord ($destinationPointer, $row) {
 		if ($this->debug) t3lib_div::devLog ('API: insertElement_createRecord()', 'templavoila', 0, array ('destinationPointer' => $destinationPointer, 'row' => $row));
 
-		$parentRecord = t3lib_BEfunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,t3ver_oid,tx_templavoila_flex');
+		$parentRecord = tx_templavoila_befunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,t3ver_oid,tx_templavoila_flex');
 
 		if ($destinationPointer['position'] > 0) {
 			$currentReferencesArr = $this->flexform_getElementReferencesFromXML ($parentRecord['tx_templavoila_flex'], $destinationPointer);
@@ -184,7 +184,7 @@ class tx_templavoila_api {
 	function insertElement_setElementReferences ($destinationPointer, $uid) {
 		if ($this->debug) t3lib_div::devLog ('API: insertElement_setElementReferences()', 'templavoila', 0, array ('destinationPointer' => $destinationPointer, 'uid' => $uid));
 
-		$parentRecord = t3lib_BEfunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,tx_templavoila_flex');
+		$parentRecord = tx_templavoila_befunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,tx_templavoila_flex');
 		if (!is_array ($parentRecord)) return FALSE;
 
 		$currentReferencesArr = $this->flexform_getElementReferencesFromXML ($parentRecord['tx_templavoila_flex'], $destinationPointer);
@@ -258,7 +258,7 @@ class tx_templavoila_api {
 		if ($this->debug) t3lib_div::devLog ('API: localizeElement()', 'templavoila', 0, array ('sourcePointer' => $sourcePointer, 'languageKey' => $languageKey));
 
 		$sourceElementRecord = $this->flexform_getRecordByPointer ($sourcePointer);
-		$parentPageRecord = t3lib_beFunc::getRecordWSOL('pages', $sourceElementRecord['pid']);
+		$parentPageRecord = tx_templavoila_befunc::getRecordWSOL('pages', $sourceElementRecord['pid']);
 		$rawPageDataStructureArr = t3lib_BEfunc::getFlexFormDS($TCA['pages']['columns']['tx_templavoila_flex']['config'], $parentPageRecord, 'pages');
 
 		if (!is_array($rawPageDataStructureArr)) return FALSE;
@@ -363,7 +363,7 @@ class tx_templavoila_api {
 
 			// Check and get all information about the source position:
 		if (!$sourcePointer = $this->flexform_getValidPointer ($sourcePointer)) return FALSE;
-		$sourceParentRecord = t3lib_BEfunc::getRecordWSOL($sourcePointer['table'], $sourcePointer['uid'],'uid,pid,tx_templavoila_flex');
+		$sourceParentRecord = tx_templavoila_befunc::getRecordWSOL($sourcePointer['table'], $sourcePointer['uid'],'uid,pid,tx_templavoila_flex');
 		if (!is_array ($sourceParentRecord)) {
 			if ($this->debug) t3lib_div::devLog ('process: Parent record of the element specified by source pointer does not exist!', 2, $sourcePointer);
 			return FALSE;
@@ -373,7 +373,7 @@ class tx_templavoila_api {
 			// Check and get all information about the destination position:
 		if (is_array ($destinationPointer)) {
 			if (!$destinationPointer = $this->flexform_getValidPointer ($destinationPointer)) return FALSE;
-			$destinationParentRecord = t3lib_BEfunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,tx_templavoila_flex');
+			$destinationParentRecord = tx_templavoila_befunc::getRecordWSOL($destinationPointer['table'], $destinationPointer['uid'],'uid,pid,tx_templavoila_flex');
 			if (!is_array ($destinationParentRecord)) {
 				if ($this->debug) t3lib_div::devLog ('process: Parent record of the element specified by destination pointer does not exist!', 2, $destinationPointer);
 				return FALSE;
@@ -386,9 +386,9 @@ class tx_templavoila_api {
 
 			// Get information about the element to be processed:
 		if (isset ($sourcePointer['sheet'])) {
-			$sourceElementRecord = t3lib_BEfunc::getRecordWSOL('tt_content', $sourceReferencesArr[$sourcePointer['position']],'*');
+			$sourceElementRecord = tx_templavoila_befunc::getRecordWSOL('tt_content', $sourceReferencesArr[$sourcePointer['position']],'*');
 		} else {
-			$sourceElementRecord = t3lib_BEfunc::getRecordWSOL('tt_content', $sourcePointer['uid'],'*');
+			$sourceElementRecord = tx_templavoila_befunc::getRecordWSOL('tt_content', $sourcePointer['uid'],'*');
 		}
 
 		switch ($mode) {
@@ -701,7 +701,7 @@ class tx_templavoila_api {
 			return FALSE;
 		}
 
-		if (!$destinationRecord = t3lib_BEfunc::getRecordWSOL($flexformPointer['table'], $flexformPointer['uid'],'uid,pid,tx_templavoila_flex')) {
+		if (!$destinationRecord = tx_templavoila_befunc::getRecordWSOL($flexformPointer['table'], $flexformPointer['uid'],'uid,pid,tx_templavoila_flex')) {
 			if ($this->debug) t3lib_div::devLog ('flexform_getValidPointer: Pointer destination record not found!', 'TemplaVoila API', 2, $flexformPointer);
 			return FALSE;
 		}
@@ -810,11 +810,11 @@ class tx_templavoila_api {
 		if (!$flexformPointer = $this->flexform_getValidPointer ($flexformPointer)) return FALSE;
 
 		if (isset ($flexformPointer['sheet'])) {
-			if (!$parentRecord = t3lib_BEfunc::getRecordWSOL($flexformPointer['table'], $flexformPointer['uid'],'uid,tx_templavoila_flex')) return FALSE;
+			if (!$parentRecord = tx_templavoila_befunc::getRecordWSOL($flexformPointer['table'], $flexformPointer['uid'],'uid,tx_templavoila_flex')) return FALSE;
 			$elementReferencesArr = $this->flexform_getElementReferencesFromXML ($parentRecord['tx_templavoila_flex'], $flexformPointer);	// This should work, because both flexFormPointer and tx_templavoila_flex will be based on any workspace overlaid record.
-			return t3lib_BEfunc::getRecordWSOL('tt_content', $elementReferencesArr[$flexformPointer['position']]);
+			return tx_templavoila_befunc::getRecordWSOL('tt_content', $elementReferencesArr[$flexformPointer['position']]);
 		} else {
-			return t3lib_BEfunc::getRecordWSOL('tt_content', $flexformPointer['uid']);
+			return tx_templavoila_befunc::getRecordWSOL('tt_content', $flexformPointer['uid']);
 		}
 	}
 
@@ -894,7 +894,7 @@ class tx_templavoila_api {
 	function flexform_getListOfSubElementUidsRecursively ($table, $uid, &$recordUids, $recursionDepth=0) {
 
 		if (!is_array($recordUids)) $recordUids = array();
-		$parentRecord = t3lib_BEfunc::getRecordWSOL($table, $uid, 'uid,pid,tx_templavoila_ds,tx_templavoila_flex');
+		$parentRecord = tx_templavoila_befunc::getRecordWSOL($table, $uid, 'uid,pid,tx_templavoila_ds,tx_templavoila_flex');
 		$flexFieldArr = t3lib_div::xml2array($parentRecord['tx_templavoila_flex']);
 		$expandedDataStructure = $this->ds_getExpandedDataStructure ($table, $parentRecord);
 
@@ -943,7 +943,7 @@ class tx_templavoila_api {
 	function flexform_getFlexformPointersToSubElementsRecursively ($table, $uid, &$flexformPointers, $recursionDepth=0) {
 
 		if (!is_array($flexformPointers)) $flexformPointers = array();
-		$parentRecord = t3lib_BEfunc::getRecordWSOL($table, $uid, 'uid,pid,tx_templavoila_flex,tx_templavoila_ds,tx_templavoila_to');
+		$parentRecord = tx_templavoila_befunc::getRecordWSOL($table, $uid, 'uid,pid,tx_templavoila_flex,tx_templavoila_ds,tx_templavoila_to');
 		$flexFieldArr = t3lib_div::xml2array($parentRecord['tx_templavoila_flex']);
 		$expandedDataStructure = $this->ds_getExpandedDataStructure ($table, $parentRecord);
 
@@ -1139,7 +1139,7 @@ class tx_templavoila_api {
 		$columnsAndFieldNamesArr = array();
 		$fieldNameOfFirstCEField = NULL;
 
-		$pageRow = t3lib_BEfunc::getRecordWSOL('pages', $contextPageUid);
+		$pageRow = tx_templavoila_befunc::getRecordWSOL('pages', $contextPageUid);
 		if (!is_array ($pageRow)) return FALSE;
 
 		$dataStructureArr = $this->ds_getExpandedDataStructure ('pages', $pageRow);
@@ -1191,7 +1191,7 @@ class tx_templavoila_api {
 	 * @access	public
 	 */
 	function ds_getColumnPositionByFieldName ($contextPageUid, $fieldName) {
-		$pageRow = t3lib_BEfunc::getRecordWSOL('pages', $contextPageUid);
+		$pageRow = tx_templavoila_befunc::getRecordWSOL('pages', $contextPageUid);
 		if (is_array($pageRow)) {
 			$dataStructureArr = $this->ds_getExpandedDataStructure ('pages', $pageRow);
 
@@ -1370,7 +1370,7 @@ class tx_templavoila_api {
 					$currentTemplateObject = $this->getContentTree_fetchPageTemplateObject($row);
 					break;
 				case 'tt_content':
-					$currentTemplateObject = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $row['tx_templavoila_to']);
+					$currentTemplateObject = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', $row['tx_templavoila_to']);
 					break;
 				default:
 					$currentTemplateObject = FALSE;
@@ -1520,7 +1520,7 @@ class tx_templavoila_api {
 			$idStr = 'tt_content:'.$recIdent['id'];
 
 			if (!t3lib_div::inList($prevRecList,$idStr))	{
-				$nextSubRecord = t3lib_BEfunc::getRecordWSOL('tt_content',$recIdent['id']);
+				$nextSubRecord = tx_templavoila_befunc::getRecordWSOL('tt_content',$recIdent['id']);
 
 				if (is_array($nextSubRecord))	{
 					$tt_content_elementRegister[$recIdent['id']]++;
@@ -1618,7 +1618,7 @@ class tx_templavoila_api {
 		if (!$templateObjectUid) {
 			$rootLine = t3lib_beFunc::BEgetRootLine($row['uid'],'', TRUE);
 			foreach($rootLine as $rootLineRecord) {
-				$pageRecord = t3lib_beFunc::getRecordWSOL('pages', $rootLineRecord['uid']);
+				$pageRecord = tx_templavoila_befunc::getRecordWSOL('pages', $rootLineRecord['uid']);
 				if (($row['uid'] != $pageRecord['uid']) && $pageRecord['tx_templavoila_next_ds'] && $pageRecord['tx_templavoila_next_to'])	{	// If there is a next-level TO:
 					$templateObjectUid = $pageRecord['tx_templavoila_next_to'];
 					break;
@@ -1628,7 +1628,7 @@ class tx_templavoila_api {
 				}
 			}
 		}
-		return t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $templateObjectUid);
+		return tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', $templateObjectUid);
 	}
 
 	/**
@@ -1700,10 +1700,10 @@ class tx_templavoila_api {
 
 			// Negative PID values is pointing to a page on the same level as the current.
 		if ($pageUid < 0) {
-			$pidRow = t3lib_BEfunc::getRecordWSOL('pages',abs($pageUid),'pid');
+			$pidRow = tx_templavoila_befunc::getRecordWSOL('pages',abs($pageUid),'pid');
 			$pageUid = $pidRow['pid'];
 		}
-		$row = t3lib_BEfunc::getRecordWSOL('pages',$pageUid);
+		$row = tx_templavoila_befunc::getRecordWSOL('pages',$pageUid);
 
 		$TSconfig = t3lib_BEfunc::getTCEFORM_TSconfig('pages', $row);
 		$storagePid = intval($TSconfig['_STORAGE_PID']);
@@ -1743,7 +1743,7 @@ class tx_templavoila_api {
 			// Traverse and set ISO codes if found:
 		foreach($this->allSystemWebsiteLanguages['rows'] as $row)	{
 			if ($row['static_lang_isocode'])	{
-				$staticLangRow = t3lib_BEfunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
+				$staticLangRow = tx_templavoila_befunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
 				if ($staticLangRow['lg_iso_2']) {
 					$this->allSystemWebsiteLanguages['rows'][$row['uid']]['_ISOcode'] = $staticLangRow['lg_iso_2'];
 					$this->allSystemWebsiteLanguages['all_lKeys'][] = 'l'.$staticLangRow['lg_iso_2'];

@@ -73,7 +73,7 @@ class tx_templavoila_referenceElementsWizard extends t3lib_extobjbase {
 			// Showing the tree:
 			// Initialize starting point of page tree:
 		$treeStartingPoint = intval($this->pObj->id);
-		$treeStartingRecord = t3lib_BEfunc::getRecord('pages', $treeStartingPoint);
+		$treeStartingRecord = tx_templavoila_befunc::getRecord('pages', $treeStartingPoint);
 		$depth = $this->pObj->MOD_SETTINGS['depth'];
 
 			// Initialize tree object:
@@ -185,7 +185,7 @@ class tx_templavoila_referenceElementsWizard extends t3lib_extobjbase {
 			$lDef = array();
 			$vDef = array();
 			if ($langField && $elementRecord[$langField])	{
-				$pageRec = t3lib_BEfunc::getRecordWSOL('pages', $pageUid);
+				$pageRec = tx_templavoila_befunc::getRecordWSOL('pages', $pageUid);
 				$xml = t3lib_BEfunc::getFlexFormDS($GLOBALS['TCA']['pages']['columns']['tx_templavoila_flex']['config'], $pageRec, 'pages', 'tx_templavoila_ds');
 				$langChildren = intval($xml['meta']['langChildren']);
 				$langDisable = intval($xml['meta']['langDisable']);
@@ -315,7 +315,7 @@ class tx_templavoila_referenceElementsWizard extends t3lib_extobjbase {
 			$output[$row['uid']]=$row;
 
 			if ($row['static_lang_isocode'])	{
-				$staticLangRow = t3lib_BEfunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
+				$staticLangRow = tx_templavoila_befunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
 				if ($staticLangRow['lg_iso_2']) {
 					$output[$row['uid']]['ISOcode'] = $staticLangRow['lg_iso_2'];
 				}

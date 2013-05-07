@@ -48,7 +48,7 @@ class tx_templavoila_template {
 		if (is_array($row)) {
 			$this->row = $row;
 		} else {
-			$this->row = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $row);
+			$this->row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', $row);
 		}
 
 		$this->setLabel($this->row['title']);

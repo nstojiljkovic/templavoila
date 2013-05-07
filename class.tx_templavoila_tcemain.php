@@ -152,7 +152,7 @@ class tx_templavoila_tcemain {
 			// Access check for FCE
 		if ($table == 'tt_content') {
 			if ($status != 'new') {
-				$row = t3lib_beFunc::getRecord($table, $id);
+				$row = tx_templavoila_befunc::getRecord($table, $id);
 			}
 			else {
 				$row = &$fieldArray;
@@ -235,7 +235,7 @@ page.10.disableExplosivePreview = 1
 							);
 
 							if ($sorting < 0) {
-								$parentRecord = t3lib_BEfunc::getRecordWSOL($destinationFlexformPointer['table'], $destinationFlexformPointer['uid'],'uid,pid,tx_templavoila_flex');
+								$parentRecord = tx_templavoila_befunc::getRecordWSOL($destinationFlexformPointer['table'], $destinationFlexformPointer['uid'],'uid,pid,tx_templavoila_flex');
 								$currentReferencesArr = $templaVoilaAPI->flexform_getElementReferencesFromXML($parentRecord['tx_templavoila_flex'], $destinationFlexformPointer);
 								if (count($currentReferencesArr)) {
 									$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('uid,' . $sorting_field, $table, 'uid IN (' . implode(',', $currentReferencesArr) . ')' . t3lib_BEfunc::deleteClause($table));
@@ -302,7 +302,7 @@ page.10.disableExplosivePreview = 1
 
 		switch ($command) {
 			case 'delete' :
-				$record = t3lib_beFunc::getRecord('tt_content', $id);
+				$record = tx_templavoila_befunc::getRecord('tt_content', $id);
 					// Check for FCE access
 				$params = array(
 					'table' => $table,
@@ -317,7 +317,7 @@ page.10.disableExplosivePreview = 1
 					if (intval($record['t3ver_oid']) > 0 && $record['pid'] == -1) {
 							// we unlink a offline version in a workspace
 						if (abs($record['t3ver_wsid']) !== 0) {
-							$record = t3lib_BEfunc::getRecord('tt_content', intval($record['t3ver_oid']));
+							$record = tx_templavoila_befunc::getRecord('tt_content', intval($record['t3ver_oid']));
 						}
 					}
 						// avoid that deleting offline version in the live workspace unlinks the online version - see #11359 
@@ -555,11 +555,11 @@ page.10.disableExplosivePreview = 1
 			if ($beUser->workspace) {
 				$record = t3lib_BEfunc::getWorkspaceVersionOfRecord($beUser->workspace, 'tx_templavoila_tmplobj', $toId, 'datastructure');
 				if (!is_array($record)) {
-					$record = t3lib_BEfunc::getRecord('tx_templavoila_tmplobj', $toId, 'datastructure');
+					$record = tx_templavoila_befunc::getRecord('tx_templavoila_tmplobj', $toId, 'datastructure');
 				}
 			}
 			else {
-				$record = t3lib_BEfunc::getRecord('tx_templavoila_tmplobj', $toId, 'datastructure');
+				$record = tx_templavoila_befunc::getRecord('tx_templavoila_tmplobj', $toId, 'datastructure');
 			}
 			if (is_array($record) && isset($record['datastructure'])) {
 				$incomingFieldArray[$dsField] = $record['datastructure'];
@@ -603,7 +603,7 @@ page.10.disableExplosivePreview = 1
 				}
 					// get the field-information and check if only "ce" fields are updated
 				$conf = $TCA[$table]['columns'][$field]['config'];
-				$currentRecord = t3lib_BEfunc::getRecord($table, $id);
+				$currentRecord = tx_templavoila_befunc::getRecord($table, $id);
 				$dataStructArray = t3lib_BEfunc::getFlexFormDS($conf, $currentRecord, $table, $field, true);
 				foreach ($data[$field]['data'] as $sheet => $sheetData)	{
 					if (!is_array($sheetData) || !is_array($dataStructArray['ROOT']['el']))	{

@@ -159,7 +159,7 @@ class tx_templavoila_dbnewcontentel {
 			$this->content = $this->doc->header($LANG->getLL('newContentElement'));
 			$this->content.=$this->doc->spacer(5);
 
-			$elRow = t3lib_BEfunc::getRecordWSOL('pages',$this->id);
+			$elRow = tx_templavoila_befunc::getRecordWSOL('pages',$this->id);
 			$header= t3lib_iconWorks::getSpriteIconForRecord('pages', $elRow);
 			$header.= t3lib_BEfunc::getRecordTitle('pages',$elRow,1);
 			$this->content.=$this->doc->section('',$header,0,1);

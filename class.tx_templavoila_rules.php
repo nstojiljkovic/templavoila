@@ -85,7 +85,7 @@ class tx_templavoila_rules {
 						$xmlContent = t3lib_div::xml2array($parentRecord['tx_templavoila_flex']);
 						$recUIDs = t3lib_div::trimExplode(',',$xmlContent['data']['sDEF']['lDEF'][$fieldName]['vDEF']);
 						foreach ($recUIDs as $recUID) {
-							$row = t3lib_BEfunc::getRecord('tt_content', $recUID, 'uid,CType,tx_templavoila_to');
+							$row = tx_templavoila_befunc::getRecord('tt_content', $recUID, 'uid,CType,tx_templavoila_to');
 							if ($row['CType'] == 'templavoila_pi1') {
 								$row['CType'] .= ',' . $row['tx_templavoila_to'];
 							}

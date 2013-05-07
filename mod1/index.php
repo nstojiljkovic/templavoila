@@ -273,7 +273,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 		if (is_array($this->altRoot))	{
 			$access = true;
 				// get PID of altRoot Element to get pageInfoArr
-			$altRootRecord = t3lib_BEfunc::getRecordWSOL ($this->altRoot['table'], $this->altRoot['uid'], 'pid');
+			$altRootRecord = tx_templavoila_befunc::getRecordWSOL ($this->altRoot['table'], $this->altRoot['uid'], 'pid');
 			$pageInfoArr = t3lib_BEfunc::readPageAccess ($altRootRecord['pid'], $this->perms_clause);
 		} else {
 			$pageInfoArr = t3lib_BEfunc::readPageAccess($this->id, $this->perms_clause);
@@ -291,7 +291,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 				// Define the root element record:
 			$this->rootElementTable = is_array($this->altRoot) ? $this->altRoot['table'] : 'pages';
 			$this->rootElementUid = is_array($this->altRoot) ? $this->altRoot['uid'] : $this->id;
-			$this->rootElementRecord = t3lib_BEfunc::getRecordWSOL($this->rootElementTable, $this->rootElementUid, '*');
+			$this->rootElementRecord = tx_templavoila_befunc::getRecordWSOL($this->rootElementTable, $this->rootElementUid, '*');
 			if ($this->rootElementRecord['t3ver_oid'] && $this->rootElementRecord['pid'] < 0) {
 					// typo3 lacks a proper API to properly detect Offline versions and extract Live Versions therefore this is done by hand
 				if ($this->rootElementTable == 'pages') {
@@ -501,7 +501,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 					// warn if page renders content from other page
 				if ($this->rootElementRecord['content_from_pid']) {
-					$contentPage = t3lib_BEfunc::getRecord('pages', intval($this->rootElementRecord['content_from_pid']));
+					$contentPage = tx_templavoila_befunc::getRecord('pages', intval($this->rootElementRecord['content_from_pid']));
 					$title = t3lib_BEfunc::getRecordTitle('pages', $contentPage);
 					$linkToPid = 'index.php?id=' . intval($this->rootElementRecord['content_from_pid']);
 					$link = '<a href="' . $linkToPid . '">' . htmlspecialchars($title) . ' (PID ' . intval($this->rootElementRecord['content_from_pid']) . ')</a>';
@@ -1151,7 +1151,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 			// get used TO
 		if( isset($elementContentTreeArr['el']['TO']) && intval($elementContentTreeArr['el']['TO'])) {
-			$toRecord = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj', intval($elementContentTreeArr['el']['TO']));
+			$toRecord = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', intval($elementContentTreeArr['el']['TO']));
 		} else {
 			$toRecord = $this->apiObj->getContentTree_fetchPageTemplateObject($this->rootElementRecord);
 		}
@@ -1243,7 +1243,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 									// Default language element. Subsitute displayed element with localized element
 								if (($subElementArr['el']['sys_language_uid']==0) && is_array($subElementArr['localizationInfo'][$this->currentLanguageUid]) && ($localizedUid = $subElementArr['localizationInfo'][$this->currentLanguageUid]['localization_uid']))	{
-									$localizedRecord = t3lib_BEfunc::getRecordWSOL('tt_content', $localizedUid, '*');
+									$localizedRecord = tx_templavoila_befunc::getRecordWSOL('tt_content', $localizedUid, '*');
 									$tree = $this->apiObj->getContentTree('tt_content', $localizedRecord);
 									$subElementArr = $tree['tree'];
 								}
@@ -1627,7 +1627,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 					switch((string)$contentTreeArr['localizationInfo'][$sys_language_uid]['mode'])	{
 						case 'exists':
-							$olrow = t3lib_BEfunc::getRecordWSOL('tt_content',$contentTreeArr['localizationInfo'][$sys_language_uid]['localization_uid']);
+							$olrow = tx_templavoila_befunc::getRecordWSOL('tt_content',$contentTreeArr['localizationInfo'][$sys_language_uid]['localization_uid']);
 
 							$localizedRecordInfo = array(
 								'uid' => $olrow['uid'],
@@ -1800,7 +1800,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 			$status = '';
 			if ($entry['table'] && $entry['uid'])	{
 				$flexObj = t3lib_div::makeInstance('t3lib_flexformtools');
-				$recRow = t3lib_BEfunc::getRecordWSOL($entry['table'], $entry['uid']);
+				$recRow = tx_templavoila_befunc::getRecordWSOL($entry['table'], $entry['uid']);
 				if ($recRow['tx_templavoila_flex'])	{
 
 						// Clean XML:
@@ -1818,7 +1818,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 						$tce->process_datamap();
 
 							// Re-fetch record:
-						$recRow = t3lib_BEfunc::getRecordWSOL($entry['table'], $entry['uid']);
+						$recRow = tx_templavoila_befunc::getRecordWSOL($entry['table'], $entry['uid']);
 					}
 
 						// Render status:
@@ -2100,7 +2100,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 						case 'exists':
 
 								// Get localized record:
-							$olrow = t3lib_BEfunc::getRecordWSOL('tt_content',$contentTreeArr['localizationInfo'][$sys_language_uid]['localization_uid']);
+							$olrow = tx_templavoila_befunc::getRecordWSOL('tt_content',$contentTreeArr['localizationInfo'][$sys_language_uid]['localization_uid']);
 
 								// Put together the records icon including content sensitive menu link wrapped around it:
 							$recordIcon_l10n = $this->getRecordStatHookValue('tt_content', $olrow['uid']).
@@ -2646,7 +2646,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 			$output[$row['uid']]=$row;
 
 			if ($row['static_lang_isocode'])	{
-				$staticLangRow = t3lib_BEfunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
+				$staticLangRow = tx_templavoila_befunc::getRecord('static_languages',$row['static_lang_isocode'],'lg_iso_2');
 				if ($staticLangRow['lg_iso_2']) {
 					$output[$row['uid']]['ISOcode'] = $staticLangRow['lg_iso_2'];
 				}
@@ -2848,7 +2848,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 	 */
 	protected function getCalcPerms($pid) {
 		if (!isset(self::$calcPermCache[$pid])) {
-			$row = t3lib_BEfunc::getRecordWSOL('pages', $pid);
+			$row = tx_templavoila_befunc::getRecordWSOL('pages', $pid);
 			$calcPerms = $GLOBALS['BE_USER']->calcPerms($row);
 			if (!$this->hasBasicEditRights('pages', $row)) {
 					// unsetting the "edit content" right - which is 16
@@ -2881,7 +2881,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 			$hasEditRights = TRUE;
 		} else {
 			$id = $record[($table == 'pages' ? 'uid' : 'pid')];
-			$pageRecord = t3lib_BEfunc::getRecordWSOL('pages', $id);
+			$pageRecord = tx_templavoila_befunc::getRecordWSOL('pages', $id);
 
 			$mayEditPage = $GLOBALS['BE_USER']->doesUserHaveAccess($pageRecord, 16);
 			$mayModifyTable = t3lib_div::inList($GLOBALS['BE_USER']->groupData['tables_modify'], $table);

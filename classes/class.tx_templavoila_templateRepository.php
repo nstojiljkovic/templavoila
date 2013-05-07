@@ -60,7 +60,7 @@ class tx_templavoila_templateRepository {
 			}
 		}
 		if (!$result && !$tsOnly) {
-			$row = t3lib_beFunc::getRecordWSOL('tx_templavoila_tmplobj', $uid);
+			$row = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj', $uid);
 			if ($row) {
 				$result = t3lib_div::makeInstance('tx_templavoila_template', $row);
 			}

@@ -272,7 +272,7 @@ class tx_templavoila_mod1_clipboard {
 			$recordButton = $this->pObj->doc->wrapClickMenuOnIcon($recordIcon, 'tt_content', $row['uid'], 1, '&callingScriptId='.rawurlencode($this->pObj->doc->scriptID), 'new,copy,cut,pasteinto,pasteafter,delete');
 
 			if ($GLOBALS['BE_USER']->workspace) {
-				$wsRow = t3lib_BEfunc::getRecordWSOL('tt_content', $row['uid']);
+				$wsRow = tx_templavoila_befunc::getRecordWSOL('tt_content', $row['uid']);
 				$isDeletedInWorkspace = $wsRow['t3ver_state'] == 2;
 			} else {
 				$isDeletedInWorkspace = FALSE;

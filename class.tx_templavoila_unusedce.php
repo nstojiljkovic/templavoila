@@ -172,7 +172,7 @@ Automatic Repair:
 						);
 							// Check if that other record is deleted or not:
 						if ($refrows_From[0] && $refrows_From[0]['ref_uid'])	{
-							$isATranslationChild = t3lib_BEfunc::getRecord('tt_content',$refrows_From[0]['ref_uid'],'uid') ? TRUE : FALSE;
+							$isATranslationChild = tx_templavoila_befunc::getRecord('tt_content',$refrows_From[0]['ref_uid'],'uid') ? TRUE : FALSE;
 						}
 
 							// Register elements etc:

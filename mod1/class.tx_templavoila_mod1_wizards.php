@@ -249,7 +249,7 @@ class tx_templavoila_mod1_wizards {
 
 			// Negative PID values is pointing to a page on the same level as the current.
 		if ($positionPid < 0) {
-			$pidRow = t3lib_BEfunc::getRecordWSOL('pages', abs($positionPid), 'pid');
+			$pidRow = tx_templavoila_befunc::getRecordWSOL('pages', abs($positionPid), 'pid');
 			$parentPageId = $pidRow['pid'];
 		} else {
 			$parentPageId = $positionPid;
@@ -416,7 +416,7 @@ class tx_templavoila_mod1_wizards {
 
 			// If no data structure is set, try to find one by using the template object
 		if ($dataArr['pages']['NEW']['tx_templavoila_to'] && !$dataArr['pages']['NEW']['tx_templavoila_ds']) {
-			$templateObjectRow = t3lib_BEfunc::getRecordWSOL('tx_templavoila_tmplobj',$dataArr['pages']['NEW']['tx_templavoila_to'],'uid,pid,datastructure');
+			$templateObjectRow = tx_templavoila_befunc::getRecordWSOL('tx_templavoila_tmplobj',$dataArr['pages']['NEW']['tx_templavoila_to'],'uid,pid,datastructure');
 			$dataArr['pages']['NEW']['tx_templavoila_ds'] = $templateObjectRow['datastructure'];
 		}
 
@@ -486,7 +486,7 @@ class tx_templavoila_mod1_wizards {
 
 			// Negative PID values is pointing to a page on the same level as the current.
 		if ($positionPid < 0) {
-			$pidRow = t3lib_BEfunc::getRecordWSOL('pages', abs($positionPid), 'pid');
+			$pidRow = tx_templavoila_befunc::getRecordWSOL('pages', abs($positionPid), 'pid');
 			$parentPageId = $pidRow['pid'];
 		} else {
 			$parentPageId = $positionPid;

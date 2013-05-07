@@ -133,7 +133,7 @@ class tx_templavoila_mod1_specialdoktypes {
 		$editButton = $this->pObj->link_edit($iconEdit, 'pages', $pageRecord['uid']);
 
 		if (intval($pageRecord['shortcut_mode']) == 0) {
-			$shortcutSourcePageRecord = t3lib_beFunc::getRecordWSOL('pages', $pageRecord['shortcut']);
+			$shortcutSourcePageRecord = tx_templavoila_befunc::getRecordWSOL('pages', $pageRecord['shortcut']);
 			$jumpToShortcutSourceLink = '<strong><a href="index.php?id='.$pageRecord['shortcut'].'">'.
 										t3lib_iconWorks::getSpriteIcon('apps-pagetree-page-shortcut').
 										$LANG->getLL ('jumptoshortcutdestination', '',1).'</a></strong>';
@@ -167,7 +167,7 @@ class tx_templavoila_mod1_specialdoktypes {
 		$iconEdit = t3lib_iconWorks::getSpriteIcon('actions-document-open', array('title' => htmlspecialchars($LANG->sL('LLL:EXT:lang/locallang_mod_web_list.xml:editPage'))));
 		$editButton = $this->pObj->link_edit($iconEdit, 'pages', $pageRecord['uid']);
 
-		$mountSourcePageRecord = t3lib_beFunc::getRecordWSOL('pages', $pageRecord['mount_pid']);
+		$mountSourcePageRecord = tx_templavoila_befunc::getRecordWSOL('pages', $pageRecord['mount_pid']);
 		$mountSourceIcon = t3lib_iconWorks::getSpriteIconForRecord('pages', $mountSourcePageRecord);
 		$mountSourceButton = $this->doc->wrapClickMenuOnIcon($mountSourceIcon, 'pages', $mountSourcePageRecord['uid'], 1, '&callingScriptId='.rawurlencode($this->doc->scriptID), 'new,copy,cut,pasteinto,pasteafter,delete');
 
