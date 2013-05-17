@@ -366,9 +366,21 @@ class tx_templavoila_dbnewcontentel {
 			$wizards = $this->config['wizardItems.'];
 		}
 		$pluginWizards = $this->wizard_appendWizards($wizards['elements.']);
-		$fceWizards = $this->wizard_renderFCEs($wizards['elements.']);
-		$appendWizards = array_merge((array) $fceWizards, (array) $pluginWizards);
+		$templavoilaTabs = array('fce');
+		foreach ($wizards as $k => $v) {
+			if ($v['templavoilaElements']) {
+				$tabKey = rtrim($k, '.');
+				if (!in_array($tabKey, $templavoilaTabs)) {
+					$templavoilaTabs[] = $tabKey;
+				}
+			}
+		}
 
+		$appendWizards = $pluginWizards;
+		foreach ($templavoilaTabs as $tabKey) {
+			$fceWizards = $this->wizard_renderFCEs($wizards['elements.'], $tabKey);
+			$appendWizards = array_merge((array) $fceWizards, (array) $appendWizards);
+		}
 		$wizardItems = array ();
 
 		if (is_array($wizards)) {
@@ -439,9 +451,10 @@ class tx_templavoila_dbnewcontentel {
 	 * Get wizard array for FCEs
 	 *
 	 * @param array $wizardElements
+	 * @param string $tabKey
 	 * @return array $returnElements
 	 */
-	function wizard_renderFCEs($wizardElements) {
+	function wizard_renderFCEs($wizardElements, $tabKey = 'fce') {
 		if (! is_array($wizardElements)) {
 			$wizardElements = array ();
 		}
@@ -456,7 +469,7 @@ class tx_templavoila_dbnewcontentel {
 		foreach ($toList as $toObj) {
 			if ($toObj->isPermittedForUser()) {
 				$tmpFilename = $toObj->getIcon();
-				$returnElements['fce.']['elements.']['fce_' . $toObj->getKey() . '.'] = array(
+				$returnElements[$tabKey.'.']['elements.']['fce_' . $toObj->getKey() . '.'] = array(
 					'icon'        => (@is_file(t3lib_div::getFileAbsFileName(substr($tmpFilename, 3)))) ? $tmpFilename : ('../' . t3lib_extMgm::siteRelPath('templavoila') . 'res1/default_previewicon.gif'),
 					'description' => $toObj->getDescription() ? htmlspecialchars($toObj->getDescription()) : $GLOBALS['LANG']->getLL('template_nodescriptionavailable'),
 					'title'       => $toObj->getLabel(),
