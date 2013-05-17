@@ -200,18 +200,20 @@ function sortable_change(el) {
 }
 
 function tv_createSortable(s, containment) {
-	Position.includeScrollOffsets = true;
-	Position.prepare();
-	Sortable.create(s,{
-		tag:"div",
-		ghosting:false,
-		format: /(.*)/,
-		handle:"sortable_handle",
-		scroll: "typo3-docbody",
-		scrollSpeed: 30,
-		dropOnEmpty:true,
-		constraint:false,
-		containment: containment,
-		onChange:sortable_change,
-		onUpdate:sortable_update});
+	if ($(s)) {
+		Position.includeScrollOffsets = true;
+		Position.prepare();
+		Sortable.create(s,{
+			tag:"div",
+			ghosting:false,
+			format: /(.*)/,
+			handle:"sortable_handle",
+			scroll: "typo3-docbody",
+			scrollSpeed: 30,
+			dropOnEmpty:true,
+			constraint:false,
+			containment: containment,
+			onChange:sortable_change,
+			onUpdate:sortable_update});
+	}
 }
