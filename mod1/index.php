@@ -1468,9 +1468,22 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 					$fieldValue = $fieldData['data'][$lKey][$vKey];
 
 					if ($TCEformsConfiguration['type'] == 'group') {
-						if ($TCEformsConfiguration['internal_type'] == 'file')	{
-							// Render preview for images:
-							$thumbnail = t3lib_BEfunc::thumbCode (array('dummyFieldName'=> $fieldValue), '', 'dummyFieldName', $this->doc->backPath, '', $TCEformsConfiguration['uploadfolder']);
+						if ($TCEformsConfiguration['internal_type'] == 'file' || $TCEformsConfiguration['internal_type'] == 'file_reference')	{
+							if (version_compare(TYPO3_version, '6.0.0', '>=') && t3lib_utility_Math::canBeInterpretedAsInteger($fieldValue)) {
+								// support for FAL in TYPO3 6.0.0
+								$fileFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
+								$fileObject = $fileFactory->getFileObject($fieldValue);
+								if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'], $fileObject->getExtension())) {
+									$imageUrl = $fileObject->process(\TYPO3\CMS\Core\Resource\ProcessedFile::CONTEXT_IMAGEPREVIEW, array())->getPublicUrl(TRUE);
+									$thumbnail = '<img src="' . $imageUrl . '" alt="' . htmlspecialchars($fileObject->getName()) . '" />';
+								} else {
+									// Icon
+									$thumbnail = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIconForFile(strtolower($fileObject->getExtension()), array('title' => $fileObject->getName()));
+								}
+							} else {
+								// Render preview for images:
+								$thumbnail = t3lib_BEfunc::thumbCode (array('dummyFieldName'=> $fieldValue), '', 'dummyFieldName', $this->doc->backPath, '', $TCEformsConfiguration['uploadfolder']);
+							}
 							$previewContent .= '<strong>'.$TCEformsLabel.'</strong> '.$thumbnail.'<br />';
 						} elseif ($TCEformsConfiguration['internal_type'] === 'db') {
 							if (!$this->renderPreviewDataObjects) {
