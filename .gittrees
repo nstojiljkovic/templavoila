@@ -1,0 +1,4 @@
+[subtree "contrib/scriptaculous"]
+	url = https://github.com/madrobby/scriptaculous.git
+	path = contrib/scriptaculous
+	branch = v1.9.0
