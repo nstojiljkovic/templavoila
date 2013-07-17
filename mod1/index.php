@@ -416,7 +416,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 				//Prototype /Scriptaculous
 				// prototype is loaded before, so no need to include twice.
-			$this->doc->JScodeLibArray['scriptaculous'] = '<script src="' . $this->doc->backPath . 'contrib/scriptaculous/scriptaculous.js?load=effects,dragdrop,builder" type="text/javascript"></script>';
+			$this->doc->JScodeLibArray['scriptaculous'] = '<script src="../contrib/scriptaculous/src/scriptaculous.js?load=effects,dragdrop,builder" type="text/javascript"></script>';
 			$this->doc->JScodeLibArray['templavoila_mod1'] = '<script src="' . $this->doc->backPath . '../' . t3lib_extMgm::siteRelPath('templavoila') . 'mod1/' . $mod1_file . '" type="text/javascript"></script>';
 
 			if (isset($this->modTSconfig['properties']['javascript.']) && is_array($this->modTSconfig['properties']['javascript.'])) {
@@ -591,7 +591,8 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 		$content .= $this->doc->endPage();
 
 			// Replace content with templated content
-		$this->content = $content;
+			// Replace core's scriptaculous lib with latest version
+		$this->content = preg_replace('/<script src="(.*)\/prototype(.*)\.js"(.*)><\/script>/msU', '<script src="../contrib/scriptaculous/lib/prototype.js" type="text/javascript"></script>', $content);
 	}
 
 	/**
