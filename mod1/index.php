@@ -592,7 +592,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 			// Replace content with templated content
 			// Replace core's scriptaculous lib with latest version
-		$this->content = preg_replace('/<script src="(.*)\/prototype(.*)\.js"(.*)><\/script>/msU', '<script src="../contrib/scriptaculous/lib/prototype.js" type="text/javascript"></script>', $content);
+		$this->content = preg_replace('/<script src="([^"]*)\/prototype(.*)\.js"([^>]*)><\/script>/msU', '<script src="../contrib/scriptaculous/lib/prototype.js" type="text/javascript"></script>', $content);
 	}
 
 	/**

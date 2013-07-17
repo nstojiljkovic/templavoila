@@ -27,7 +27,7 @@
  *
  * @author	Tolleiv Nietsch <tolleiv.nietsch@typo3.org>
  */
-class tx_templavoila_templateRepository {
+class tx_templavoila_templateRepository implements t3lib_Singleton {
 
 	/**
 	 * @var bool
@@ -281,7 +281,7 @@ class tx_templavoila_templateRepository {
 						} else {
 							$diff = $this->array_diff_recursive($globalTemplatesConf[$toKey], $toConf);
 							if (count($diff)>0) {
-								throw new Tx_IndexerAdapter_Exception_InvalidConfigurationException(sprintf('TypoScript configuration for indexer_adapter configuration "%s" is different on pages with uids %s and %s. This is not allowed!', $toKey, $pid, $uniqueTSRegistrationPids[$toKey]), 9776234);
+								throw new Exception(sprintf('TypoScript configuration for templavoila is not the same on all pages. Error encountered on page %s, for template %s. This is not allowed!', $pid, $toKey), 9776234);
 							}
 						}
 					}
