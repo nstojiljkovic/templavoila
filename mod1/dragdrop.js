@@ -183,7 +183,16 @@ function sortable_update(el) {
 		if (!(typeof node.className == "undefined") && node.className.search(/tpm-element(?!-)/) > -1) {
 			if (sortable_currentItem && node.id == sortable_currentItem.id ) {
 				var url = T3_TV_MOD1_BACKPATH + "ajax.php?ajaxID=tx_templavoila_mod1_ajax::moveRecord&source=" + all_items[sortable_currentItem.id] + "&destination=" + all_items[el.id] + (i-1); /* xxx */
-				new Ajax.Request(url);
+				// start loader
+				var mask = new Ext.LoadMask(Ext.getBody(), {msg: ""});
+				mask.show();
+				Ext.select('.ext-el-mask').setStyle('background-color', '#f8f8f8');
+				new Ajax.Request(url, {
+					onComplete: function(response) {
+						//stop loader regardless of the result
+						mask.hide();
+					}
+				});
 				sortable_currentItem = false;
 			}
 			sortable_updateItemButtons(node, i, all_items[el.id]);
@@ -197,6 +206,25 @@ function sortable_update(el) {
 
 function sortable_change(el) {
 	sortable_currentItem=el;
+}
+
+/**
+ * Func that is called when a record is deleted, it is used for shown a loader while the record is being deleted
+ * to stop the user from making any additional changes.
+ *
+ * @param confirmMsg message for confirm() method
+ * @returns {boolean} ok|cancel
+ */
+function deleteRecordWithLoader(confirmMsg) {
+	var ok = confirm(confirmMsg);
+	if(ok) {
+		var mask = new Ext.LoadMask(Ext.getBody(), {msg: ""});
+		mask.show();
+		Ext.select('.ext-el-mask').setStyle('background-color', '#f8f8f8');
+		// this loader disappears after page reloading, which happens after record deletion
+		return true;
+	}
+	return false;
 }
 
 function tv_createSortable(s, containment) {
