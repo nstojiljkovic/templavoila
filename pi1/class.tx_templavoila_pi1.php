@@ -368,9 +368,12 @@ class tx_templavoila_pi1 extends tslib_pibase {
 								}
 							}
 
+							$fields = array();
 							foreach ($dataValues as $fieldName => $fieldValue) {
+								$fields[$fieldName] = $fieldValue[$vKey];
 								$view->assign($fieldName, $fieldValue[$vKey]);
 							}
+							$view->assign('fields', $fields);
 							$view->assign('data', $this->cObj->data);
 							$view->assign('current', $this->cObj->data[$this->cObj->currentValKey]);
 
