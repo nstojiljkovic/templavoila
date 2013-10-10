@@ -368,10 +368,9 @@ class tx_templavoila_pi1 extends tslib_pibase {
 								}
 							}
 
-							$fields = array();
-							foreach ($dataValues as $fieldName => $fieldValue) {
-								$fields[$fieldName] = $fieldValue[$vKey];
-								$view->assign($fieldName, $fieldValue[$vKey]);
+							$fields = $this->getFieldsFromDataValuesForFluid($dataValues, $vKey);
+							foreach ($fields as $fieldName => $fieldValue) {
+								$view->assign($fieldName, $fieldValue);
 							}
 							$view->assign('fields', $fields);
 							$view->assign('data', $this->cObj->data);
@@ -488,6 +487,29 @@ class tx_templavoila_pi1 extends tslib_pibase {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * @param array $dataValues
+	 * @param string $vKey
+	 * @return array
+	 */
+	protected function getFieldsFromDataValuesForFluid($dataValues, $vKey) {
+		$fields = array();
+
+		foreach ($dataValues as $fieldName => $fieldValue) {
+			if (array_key_exists($vKey, $fieldValue)) {
+				$fields[$fieldName] = $fieldValue[$vKey];
+			} elseif (array_key_exists('el', $fieldValue)) {
+				if ($fieldValue['el'] && is_array($fieldValue['el'])) {
+					$fields[$fieldName] = $this->getFieldsFromDataValuesForFluid($fieldValue['el'], $vKey);
+				} else {
+					$fields[$fieldName] = $fieldValue['el'];
+				}
+			}
+		}
+
+		return $fields;
 	}
 
 	/**
