@@ -22,11 +22,20 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-class tx_templavoila_befunc extends t3lib_BEfunc {
+class tx_templavoila_befunc {
 	/**
 	 * @var bool
 	 */
 	static $enableFluidTemplateObjects = NULL;
+
+	/**
+	 * @param $name
+	 * @param $arguments
+	 * @return mixed
+	 */
+	public static function __callStatic($name, $arguments) {
+		return forward_static_call_array(array('t3lib_BEfunc', $name), $arguments);
+	}
 
 	/**
 	 * @return bool|null

@@ -25,7 +25,7 @@
 /**
  * Class to provide unique access to datastructure
  *
- * @author	Tolleiv Nietsch <tolleiv.nietsch@typo3.org>
+ * @author	Nikola Stojiljkovic
  */
 class tx_templavoila_templateRepository implements t3lib_Singleton {
 
@@ -365,6 +365,8 @@ class tx_templavoila_templateRepository implements t3lib_Singleton {
 		return $result;
 	}
 
+	protected $tsfeCache = array();
+
 	/**
 	 * Loads the TypoScript for a page
 	 *
@@ -372,14 +374,18 @@ class tx_templavoila_templateRepository implements t3lib_Singleton {
 	 * @return array The TypoScript setup
 	 */
 	protected function loadTSFE($pageUid) {
-		$sysPageObj = t3lib_div::makeInstance('t3lib_pageSelect');
-		$rootLine = $sysPageObj->getRootLine($pageUid);
-		$TSObj = t3lib_div::makeInstance('t3lib_tsparser_ext');
-		$TSObj->tt_track = 0;
-		$TSObj->init();
-		$TSObj->runThroughTemplates($rootLine);
-		$TSObj->generateConfig();
-		return $TSObj->setup;
+		if (!$this->tsfeCache[$pageUid]) {
+			$sysPageObj = t3lib_div::makeInstance('t3lib_pageSelect');
+			$rootLine = $sysPageObj->getRootLine($pageUid);
+			$TSObj = t3lib_div::makeInstance('t3lib_tsparser_ext');
+			$TSObj->tt_track = 0;
+			$TSObj->init();
+			$TSObj->runThroughTemplates($rootLine);
+			$TSObj->generateConfig();
+			$this->tsfeCache[$pageUid] = $TSObj->setup;
+		}
+
+		return $this->tsfeCache[$pageUid];
 	}
 
 	/**
