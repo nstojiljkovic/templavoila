@@ -32,14 +32,15 @@
 
 	// DEFAULT initialization of a module [BEGIN]
 unset($MCONF);
-require (dirname(__FILE__) . '/conf.php');
-require ($BACK_PATH.'init.php');
-require_once ($BACK_PATH.'template.php');
-$LANG->includeLLFile('EXT:templavoila/cm2/locallang.xml');
-require_once (PATH_t3lib.'class.t3lib_scbase.php');
-require_once (PATH_t3lib.'class.t3lib_flexformtools.php');
-require_once (PATH_t3lib.'class.t3lib_tcemain.php');
-require_once (PATH_t3lib.'class.t3lib_diff.php');
+require_once(dirname(__FILE__) . '/conf.php');
+require_once($GLOBALS['BACK_PATH'] . 'init.php');
+$GLOBALS['LANG']->includeLLFile('EXT:templavoila/cm2/locallang.xml');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (PATH_t3lib.'class.t3lib_scbase.php');
+	require_once (PATH_t3lib.'class.t3lib_flexformtools.php');
+	require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+	require_once (PATH_t3lib.'class.t3lib_diff.php');
+}
 
 
 
@@ -250,10 +251,8 @@ class tx_templavoila_cm2 extends t3lib_SCbase {
 	 * @return	string		HTML formatted output, marked up in colors
 	 */
 	function markUpXML($str)	{
-		require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
-
 			// Make instance of syntax highlight class:
-		$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+		$hlObj = t3lib_div::makeInstance('tx_templavoila_syntaxhighlighting');
 
 			// Check which document type, if applicable:
 		if (strstr(substr($str,0,100),'<T3DataStructure'))	{

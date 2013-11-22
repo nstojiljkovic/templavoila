@@ -32,12 +32,15 @@
 
 	// Initialize module
 unset($MCONF);
-require (dirname(__FILE__) . '/conf.php');
-require ($BACK_PATH.'init.php');
-require_once ($BACK_PATH.'template.php');
-$LANG->includeLLFile('EXT:templavoila/mod2/locallang.xml');
-require_once (PATH_t3lib.'class.t3lib_scbase.php');
-$BE_USER->modAccess($MCONF,1);    // This checks permissions and exits if the users has no permission for entry.
+require_once(dirname(__FILE__) . '/conf.php');
+require_once($GLOBALS['BACK_PATH'] . 'init.php');
+$GLOBALS['LANG']->includeLLFile('EXT:templavoila/mod2/locallang.xml');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once($GLOBALS['BACK_PATH'] . 'template.php');
+	require_once (PATH_t3lib.'class.t3lib_scbase.php');
+}
+	// This checks permissions and exits if the users has no permission for entry.
+$GLOBALS['BE_USER']->modAccess($MCONF, 1);
 
 
 /**
@@ -143,7 +146,11 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 			if(tx_templavoila_div::convertVersionNumberToInteger(TYPO3_version) < 4005000) {
 				$this->doc->getDynTabMenuJScode();
 			} else {
-				$this->doc->loadJavascriptLib('js/tabmenu.js');
+				if (version_compare(TYPO3_version,'6.0.0','<')) {
+					$this->doc->loadJavascriptLib('js/tabmenu.js');
+				} else {
+					$this->doc->loadJavascriptLib('sysext/backend/Resources/Public/JavaScript/tabmenu.js');
+				}
 			}
 
 
@@ -619,8 +626,12 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 			// Format XML if requested (renders VERY VERY slow)
 		if ($this->MOD_SETTINGS['set_showDSxml'])	{
 			if ($dsObj->getDataprotXML())	{
-				require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
-				$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+				if (version_compare(TYPO3_version,'6.0.0','<')) {
+					require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
+					$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+				} else {
+					$hlObj = t3lib_div::makeInstance('tx_templavoila_syntaxhighlighting');
+				}
 				$content.='<pre>'.str_replace(chr(9),'&nbsp;&nbsp;&nbsp;',$hlObj->highLight_DS($dsObj->getDataprotXML())).'</pre>';
 			}
 			$lpXML.= $editDataprotLink;
@@ -741,8 +752,12 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 			// Format XML if requested
 		if ($this->MOD_SETTINGS['set_details'])	{
 			if ($toObj->getLocalDataprotXML(TRUE))	{
-				require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
-				$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+				if (version_compare(TYPO3_version,'6.0.0','<')) {
+					require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
+					$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+				} else {
+					$hlObj = t3lib_div::makeInstance('tx_templavoila_syntaxhighlighting');
+				}
 				$lpXML = '<pre>'.str_replace(chr(9),'&nbsp;&nbsp;&nbsp;',$hlObj->highLight_DS($toObj->getLocalDataprotXML(TRUE))).'</pre>';
 			} else $lpXML = '';
 		}
@@ -2042,7 +2057,9 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 			$outputString.=  sprintf($GLOBALS['LANG']->getLL('newsitewizard_basicsshouldwork', 1), $menuTypeText, $menuType, $menuTypeText);
 
 				// Start up HTML parser:
-			require_once(PATH_t3lib.'class.t3lib_parsehtml.php');
+			if (version_compare(TYPO3_version,'6.0.0','<')) {
+				require_once(PATH_t3lib.'class.t3lib_parsehtml.php');
+			}
 			$htmlParser = t3lib_div::makeinstance('t3lib_parsehtml');
 
 				// Parse into blocks
@@ -2299,7 +2316,9 @@ lib.'.$menuType.'.1.ACT {
 	 * @return	string		HTML content with it highlighted.
 	 */
 	function syntaxHLTypoScript($v)	{
-		require_once(PATH_t3lib.'class.t3lib_tsparser_ext.php');
+		if (version_compare(TYPO3_version,'6.0.0','<')) {
+			require_once(PATH_t3lib.'class.t3lib_tsparser_ext.php');
+		}
 
 		$tsparser = t3lib_div::makeInstance('t3lib_TSparser');
 		$tsparser->lineNumberOffset=0;
@@ -2364,7 +2383,9 @@ lib.'.$menuType.'.1.ACT {
 					// Execute changes:
 				global $TYPO3_CONF_VARS;
 
-				require_once(PATH_t3lib.'class.t3lib_tcemain.php');
+				if (version_compare(TYPO3_version,'6.0.0','<')) {
+					require_once(PATH_t3lib.'class.t3lib_tcemain.php');
+				}
 				$tce = t3lib_div::makeInstance('t3lib_TCEmain');
 				$tce->stripslashes_values = 0;
 				$tce->dontProcessTransformations = 1;

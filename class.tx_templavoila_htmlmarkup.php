@@ -29,8 +29,9 @@
  * @author	Kasper Skaarhoj <kasper@typo3.com>
  */
 
-require_once(PATH_t3lib.'class.t3lib_parsehtml.php');
-
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once(PATH_t3lib.'class.t3lib_parsehtml.php');
+}
 
 /**
  * HTML markup/search class; can mark up HTML with small images for each element AND as well help you extract parts of the HTML based on a socalled 'PATH'.

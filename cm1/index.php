@@ -32,17 +32,19 @@
 
 	// DEFAULT initialization of a module [BEGIN]
 unset($MCONF);
-require (dirname(__FILE__) . '/conf.php');
-require ($BACK_PATH.'init.php');
-require_once ($BACK_PATH.'template.php');
-$LANG->includeLLFile('EXT:templavoila/cm1/locallang.xml');
-require_once (PATH_t3lib.'class.t3lib_scbase.php');
+require_once(dirname(__FILE__) . '/conf.php');
+require_once($GLOBALS['BACK_PATH'] . 'init.php');
+$GLOBALS['LANG']->includeLLFile('EXT:templavoila/cm1/locallang.xml');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (PATH_t3lib.'class.t3lib_scbase.php');
+}
 
-require_once (t3lib_extMgm::extPath('templavoila').'cm1/class.tx_templavoila_cm1_dsedit.php');
-require_once (t3lib_extMgm::extPath('templavoila').'cm1/class.tx_templavoila_cm1_etypes.php');
-
-require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_htmlmarkup.php');
-require_once(PATH_t3lib.'class.t3lib_tcemain.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (t3lib_extMgm::extPath('templavoila').'cm1/class.tx_templavoila_cm1_dsedit.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'cm1/class.tx_templavoila_cm1_etypes.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_htmlmarkup.php');
+	require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+}
 
 
 if (t3lib_extMgm::isLoaded('lorem_ipsum'))	{
@@ -419,7 +421,7 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 		if(tx_templavoila_div::convertVersionNumberToInteger(TYPO3_version) < 4005000) {
 			$this->doc->getDynTabMenuJScode();
 		} else {
-			$this->doc->loadJavascriptLib('js/tabmenu.js');
+			$this->doc->loadJavascriptLib('sysext/backend/Resources/Public/JavaScript/tabmenu.js');
 		}
 
 			// Setting up the context sensitive menu:
@@ -1012,10 +1014,8 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 			switch($cmd)	{
 					// Show XML DS
 				case 'showXMLDS':
-					require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
-
 						// Make instance of syntax highlight class:
-					$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+					$hlObj = t3lib_div::makeInstance('tx_templavoila_syntaxhighlighting');
 
 					$storeDataStruct=$dataStruct;
 					if (is_array($storeDataStruct['ROOT']['el']))
@@ -1240,10 +1240,8 @@ class tx_templavoila_cm1 extends t3lib_SCbase {
 
 					// Display XML of data structure:
 				if (is_array($dataStruct))	{
-					require_once(PATH_t3lib.'class.t3lib_syntaxhl.php');
-
 						// Make instance of syntax highlight class:
-					$hlObj = t3lib_div::makeInstance('t3lib_syntaxhl');
+					$hlObj = t3lib_div::makeInstance('tx_templavoila_syntaxhighlighting');
 
 					$dataStructureXML = t3lib_div::array2xml_cs($origDataStruct,'T3DataStructure', array('useCDATA' => 1));
 					$content.='

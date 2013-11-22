@@ -34,10 +34,12 @@
  *
  * @author	Robert Lemke <robert@typo3.org>
  */
- 
 
-require_once (t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
-require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
+	require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+}
 
 class tx_templavoila_api_testcase extends tx_phpunit_database_testcase {
 

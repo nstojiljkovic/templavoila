@@ -5,6 +5,9 @@
 $extensionPath = t3lib_extMgm::extPath('templavoila');
 $extensionClassesPath = $extensionPath . 'classes/';
 return array(
+	'tx_templavoila_icons' => $extensionClassesPath . 'class.tx_templavoila_icons.php',
+	'tx_templavoila_label' => $extensionClassesPath . 'class.tx_templavoila_label.php',
+	'tx_templavoila_syntaxhighlighting' => $extensionClassesPath . 'class.tx_templavoila_syntaxhighlighting.php',
 	'tx_templavoila_access' => $extensionPath . 'class.tx_templavoila_access.php',
 	'tx_templavoila_api' => $extensionPath . 'class.tx_templavoila_api.php',
 	'tx_templavoila_cm1' => $extensionPath . 'cm1/index.php',

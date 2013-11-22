@@ -29,7 +29,9 @@
  * @author	Kasper Skaarhoj
  */
 
-require_once(PATH_t3lib.'class.t3lib_flexformtools.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once(PATH_t3lib.'class.t3lib_flexformtools.php');
+}
 
 /**
  * Conversion of localization mode in Data Structures

@@ -29,7 +29,9 @@
  * @author     Dmitry Dulepov <dmitry@typo3.org>
  */
 
-require_once('class.tx_templavoila_mod1_recordlist.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once('class.tx_templavoila_mod1_recordlist.php');
+}
 
 /**
  * Submodule 'records' for the templavoila page module

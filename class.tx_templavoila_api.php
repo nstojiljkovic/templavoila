@@ -29,8 +29,10 @@
  * @author     Robert Lemke <robert@typo3.org>
  */
 
-require_once (PATH_t3lib.'class.t3lib_loaddbgroup.php');
-require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (PATH_t3lib.'class.t3lib_loaddbgroup.php');
+	require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+}
 
 /**
  * Public API class for proper handling of content elements and other useful TemplaVoila related functions

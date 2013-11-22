@@ -21,6 +21,7 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
 /**
  * Reference elements wizard,
  * References all unused elements in a treebranch to a specific point in the TV-DS
@@ -30,9 +31,11 @@
  * @author     Robert Lemke <robert@typo3.org>
  */
 
-require_once(PATH_t3lib.'class.t3lib_pagetree.php');
-require_once(PATH_t3lib.'class.t3lib_extobjbase.php');
-require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once(PATH_t3lib.'class.t3lib_pagetree.php');
+	require_once(PATH_t3lib.'class.t3lib_extobjbase.php');
+	require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
+}
 
 class tx_templavoila_referenceElementsWizard extends t3lib_extobjbase {
 

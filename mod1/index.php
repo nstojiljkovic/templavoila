@@ -33,30 +33,34 @@
 
 	// Initialize module
 unset($MCONF);
-require (dirname(__FILE__) . '/conf.php');
-require ($BACK_PATH.'init.php');
-require_once ($BACK_PATH.'template.php');
-$LANG->includeLLFile('EXT:templavoila/mod1/locallang.xml');
-require_once (PATH_t3lib.'class.t3lib_scbase.php');
-$BE_USER->modAccess($MCONF,1);    								// This checks permissions and exits if the users has no permission for entry.
+require_once(dirname(__FILE__) . '/conf.php');
+require_once($GLOBALS['BACK_PATH'] . 'init.php');
+$GLOBALS['LANG']->includeLLFile('EXT:templavoila/mod1/locallang.xml');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once (PATH_t3lib.'class.t3lib_scbase.php');
+}
+	// This checks permissions and exits if the users has no permission for entry.
+$GLOBALS['BE_USER']->modAccess($MCONF, 1);
 
-t3lib_extMgm::isLoaded('cms',1);
+t3lib_extMgm::isLoaded('cms', TRUE);
 
-	// We need the TCE forms functions
-require_once (PATH_t3lib.'class.t3lib_loaddbgroup.php');
-require_once (PATH_t3lib.'class.t3lib_tcemain.php');
-require_once (PATH_t3lib.'class.t3lib_clipboard.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+		// We need the TCE forms functions
+	require_once (PATH_t3lib.'class.t3lib_loaddbgroup.php');
+	require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+	require_once (PATH_t3lib.'class.t3lib_clipboard.php');
 
-	// Include TemplaVoila API
-require_once (t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
+		// Include TemplaVoila API
+	require_once (t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
 
-	// Include class for rendering the side bar and wizards:
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_sidebar.php');
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_wizards.php');
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_clipboard.php');
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_localization.php');
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_records.php');
-require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_specialdoktypes.php');
+		// Include class for rendering the side bar and wizards:
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_sidebar.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_wizards.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_clipboard.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_localization.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_records.php');
+	require_once (t3lib_extMgm::extPath('templavoila').'mod1/class.tx_templavoila_mod1_specialdoktypes.php');
+}
 
 /**
  * Module 'Page' for the 'templavoila' extension.
@@ -439,7 +443,7 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 			if(tx_templavoila_div::convertVersionNumberToInteger(TYPO3_version) < 4005000) {
 				$this->doc->JScode .= $this->doc->getDynTabMenuJScode();
 			} else {
-				$this->doc->loadJavascriptLib('js/tabmenu.js');
+				$this->doc->loadJavascriptLib('sysext/backend/Resources/Public/JavaScript/tabmenu.js');
 			}
 
 			$this->doc->JScode .= $this->modTSconfig['properties']['sideBarEnable'] ? $this->sideBarObj->getJScode() : '';
@@ -835,7 +839,6 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 		}
 
 			// show sys_notes
-		include_once(PATH_typo3 . 'class.db_list.inc');
 		$sys_notes = recordList::showSysNotesForPage();
 		if ($sys_notes) {
 			$output .= '</div><div>'.$this->doc->section($LANG->sL('LLL:EXT:cms/layout/locallang.xml:internalNotes'), str_replace('sysext/sys_note/ext_icon.gif', $GLOBALS['BACK_PATH'] . 'sysext/sys_note/ext_icon.gif', $sys_notes), 0, 1);

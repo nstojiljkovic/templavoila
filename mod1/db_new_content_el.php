@@ -35,27 +35,27 @@
  * @coauthor	Kasper Skaarhoj <kasper@typo3.com>
  */
 
-unset($MCONF);
-require (dirname(__FILE__) . '/conf.php');
-require ($BACK_PATH.'init.php');
-require_once ($BACK_PATH.'template.php');
+require_once(dirname(__FILE__) . '/conf.php');
+require_once($GLOBALS['BACK_PATH'] . 'init.php');
 
 	// Unset MCONF/MLANG since all we wanted was back path etc. for this particular script.
 unset($MCONF);
 unset($MLANG);
 
 	// Merging locallang files/arrays:
-$LANG->includeLLFile('EXT:lang/locallang_misc.xml');
-$LOCAL_LANG_orig = $LOCAL_LANG;
-$LANG->includeLLFile('EXT:templavoila/mod1/locallang_db_new_content_el.xml');
-$LOCAL_LANG = t3lib_div::array_merge_recursive_overrule($LOCAL_LANG_orig,$LOCAL_LANG);
+$GLOBALS['LANG']->includeLLFile('EXT:lang/locallang_misc.xml');
+$LOCAL_LANG_orig = $GLOBALS['LOCAL_LANG'];
+$GLOBALS['LANG']->includeLLFile('EXT:templavoila/mod1/locallang_db_new_content_el.xml');
+$GLOBALS['LOCAL_LANG'] = t3lib_div::array_merge_recursive_overrule($LOCAL_LANG_orig,$GLOBALS['LOCAL_LANG']);
 
 	// Exits if 'cms' extension is not loaded:
 t3lib_extMgm::isLoaded('cms',1);
 
-	// Include needed libraries:
-require_once (PATH_t3lib.'class.t3lib_page.php');
-require_once (t3lib_extMgm::extPath ('templavoila').'class.tx_templavoila_api.php');
+if (version_compare(TYPO3_version,'6.0.0','<')) {
+		// Include needed libraries:
+	require_once (PATH_t3lib.'class.t3lib_page.php');
+	require_once (t3lib_extMgm::extPath ('templavoila').'class.tx_templavoila_api.php');
+}
 
 /**
  * Script Class for the New Content element wizard
@@ -120,7 +120,11 @@ class tx_templavoila_dbnewcontentel {
 		if(tx_templavoila_div::convertVersionNumberToInteger(TYPO3_version) < 4005000) {
 			$this->doc->JScodeLibArray['dyntabmenu'] = $this->doc->getDynTabMenuJScode();
 		} else {
-			$this->doc->loadJavascriptLib('js/tabmenu.js');
+			if (version_compare(TYPO3_version,'6.0.0','<')) {
+				$this->doc->loadJavascriptLib('js/tabmenu.js');
+			} else {
+				$this->doc->loadJavascriptLib('sysext/backend/Resources/Public/JavaScript/tabmenu.js');
+			}
 		}
 
 		$this->doc->form='<form action="" name="editForm">';
