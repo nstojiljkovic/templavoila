@@ -36,6 +36,7 @@ require_once(dirname(__FILE__) . '/conf.php');
 require_once($GLOBALS['BACK_PATH'] . 'init.php');
 $GLOBALS['LANG']->includeLLFile('EXT:templavoila/cm1/locallang.xml');
 if (version_compare(TYPO3_version,'6.0.0','<')) {
+	require_once ($GLOBALS['BACK_PATH'] . 'template.php');
 	require_once (PATH_t3lib.'class.t3lib_scbase.php');
 }
 
