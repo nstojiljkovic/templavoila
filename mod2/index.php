@@ -146,7 +146,7 @@ class tx_templavoila_module2 extends t3lib_SCbase {
 			if(tx_templavoila_div::convertVersionNumberToInteger(TYPO3_version) < 4005000) {
 				$this->doc->getDynTabMenuJScode();
 			} else {
-				if (version_compare(TYPO3_version,'6.0.0','<')) {
+				if (version_compare(TYPO3_version,'6.2','<')) {
 					$this->doc->loadJavascriptLib('js/tabmenu.js');
 				} else {
 					$this->doc->loadJavascriptLib('sysext/backend/Resources/Public/JavaScript/tabmenu.js');
