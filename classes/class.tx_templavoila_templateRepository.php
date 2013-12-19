@@ -264,34 +264,25 @@ class tx_templavoila_templateRepository implements t3lib_Singleton {
 	 * @param int $pageUid
 	 * @return array The TypoScript setup
 	 */
-	function loadTSTOSettings($pageUid) {
+	protected function loadTSTOSettings($pageUid) {
 		if (TYPO3_MODE=='FE' && $GLOBALS['TSFE']) {
 			return $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
 		} elseif (!$this->tsCache[$pageUid]) {
-			if ($pageUid==0) {
-				$globalTemplatesConf = array();
+			if (t3lib_extMgm::isLoaded('ed_cache')) {
+				$cacheRepository = t3lib_div::makeInstance('Tx_EdCache_Domain_Repository_CacheRepository'); /* @cacheRepository \Tx_EdCache_Domain_Repository_CacheRepository */
 
-				foreach ($this->getAllTypoScriptRecordPids() as $pid) {
-					$ts = $this->loadTSFE($pid);
-					$tsConfiguration = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
-
-					foreach($tsConfiguration as $toKey => $toConf) {
-						if (!$globalTemplatesConf[$toKey]) {
-							$globalTemplatesConf[$toKey] = $toConf;
-						} else {
-							$diff = $this->array_diff_recursive($globalTemplatesConf[$toKey], $toConf);
-							if (count($diff)>0) {
-								throw new Exception(sprintf('TypoScript configuration for templavoila is not the same on all pages. Error encountered on page %s, for template %s. This is not allowed!', $pid, $toKey), 9776234);
-							}
-						}
-					}
-
-				}
-
-				$this->tsCache[$pageUid] = $globalTemplatesConf;
+				$cacheConf = array(
+					'contentFunc' => array($this, 'loadTSTOSettingsBEImpl'),
+					'contentFuncParams' => array(
+						$pageUid
+					)
+				);
+				$cacheConf['expire_on_datetime'] = $GLOBALS['EXEC_TIME'] + 86400; // 1 day expiry
+				//$cacheConf['expire_on_branch_update_pid'] = $pageUid;
+				//$cacheConf['expire_on_branch_update_depth'] = 99;
+				$this->tsCache[$pageUid] = $cacheRepository->getByKey('templavoila_ts_'.$pageUid, $cacheConf);
 			} else {
-				$ts = $this->loadTSFE($pageUid);
-				$this->tsCache[$pageUid] = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'];
+				$this->tsCache[$pageUid] = $this->loadTSTOSettingsBEImpl($pageUid);
 			}
 		}
 
@@ -299,6 +290,42 @@ class tx_templavoila_templateRepository implements t3lib_Singleton {
 	}
 
 	/**
+	 * Loads the TypoScript for a page
+	 *
+	 * @param int $pageUid
+	 * @return array The TypoScript setup
+	 */
+	public function loadTSTOSettingsBEImpl($pageUid) {
+		if ($pageUid==0) {
+			$globalTemplatesConf = array();
+
+			foreach ($this->getAllTypoScriptRecordPids() as $pid) {
+				$ts = $this->loadTSFE($pid);
+				$tsConfiguration = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $ts['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
+
+				foreach($tsConfiguration as $toKey => $toConf) {
+					if (!$globalTemplatesConf[$toKey]) {
+						$globalTemplatesConf[$toKey] = $toConf;
+					} else {
+						$diff = $this->array_diff_recursive($globalTemplatesConf[$toKey], $toConf);
+						if (count($diff)>0) {
+							throw new Exception(sprintf('TypoScript configuration for templavoila is not the same on all pages. Error encountered on page %s, for template %s. This is not allowed!', $pid, $toKey), 9776234);
+						}
+					}
+				}
+
+			}
+
+			$result = $globalTemplatesConf;
+		} else {
+			$ts = $this->loadTSFE($pageUid);
+			$result = $ts['plugin.']['tx_templavoila.']['settings.']['templates.'];
+		}
+
+		return $result;
+	}
+
+		/**
 	 * Filters keys off from first array that also exist in second array. Comparison is done by keys and values.
 	 * This method is a recursive version of php array_diff()
 	 *
