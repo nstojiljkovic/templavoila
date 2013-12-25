@@ -370,4 +370,5 @@ if (TYPO3_MODE == 'BE' ||
 	);
 	t3lib_SpriteManager::addSingleIcons($icons, $_EXTKEY);
 }
+unset($tempColumns);
 ?>
