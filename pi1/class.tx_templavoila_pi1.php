@@ -376,6 +376,13 @@ class tx_templavoila_pi1 extends tslib_pibase {
 							}
 							$view->assign('fields', $fields);
 							$view->assign('data', $this->cObj->data);
+							if (class_exists('Tx_Extbase_Service_TypoScriptService')) {
+								$typoScriptService = t3lib_div::makeInstance('Tx_Extbase_Service_TypoScriptService'); /* @var $typoScriptService Tx_Extbase_Service_TypoScriptService */
+								$tvSettings = $typoScriptService->convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']);
+							} else {
+								$tvSettings = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.'];
+							}
+							$view->assign('settings', $tvSettings);
 							$view->assign('current', $this->cObj->data[$this->cObj->currentValKey]);
 
 							/**
