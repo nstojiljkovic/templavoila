@@ -272,9 +272,25 @@ class tx_templavoila_mod1_wizards {
 				$fakeRow = array('uid' => $parentPageId);
 				$defaultTO = $this->pObj->apiObj->getContentTree_fetchPageTemplateObject($fakeRow);
 
+				$dsRepo = t3lib_div::makeInstance('tx_templavoila_datastructureRepository'); /* @var $dsRepo tx_templavoila_datastructureRepository */
+				$toRepo = t3lib_div::makeInstance('tx_templavoila_templateRepository'); /* @var $toRepo tx_templavoila_templateRepository */
+
+				if ($defaultTO['uid']) {
+					// reread the to in case there's
+					$toList = $toRepo->getTemplatesByStoragePidAndScope($storageFolderPID, tx_templavoila_datastructure::SCOPE_PAGE);
+					foreach ($toList as $toObj) {
+						$toRow = $toObj->getRow();
+						if ($toRow['uid']==$defaultTO['uid']) {
+							$defaultTO = $toRow;
+							break;
+						}
+					}
+				}
+
 					// Create the "Default template" entry
 				if ($defaultTO['previewicon']) {
 					$previewIconFilename = (@is_file(t3lib_div::getFileAbsFileName('uploads/tx_templavoila/' . $defaultTO['previewicon']))) ? ($GLOBALS['BACK_PATH'] . '../' . 'uploads/tx_templavoila/' . $defaultTO['previewicon']) : $defaultIcon;
+					$previewIconFilename = (@is_file(t3lib_div::getFileAbsFileName($defaultTO['previewicon']))) ? ($GLOBALS['BACK_PATH'] . str_replace(PATH_site, '../', t3lib_div::getFileAbsFileName($defaultTO['previewicon']))) : $previewIconFilename;
 				} else {
 					$previewIconFilename = $defaultIcon;
 				}
@@ -294,8 +310,6 @@ class tx_templavoila_mod1_wizards {
 				</tr>
 				</table>';
 
-				$dsRepo = t3lib_div::makeInstance('tx_templavoila_datastructureRepository');
-				$toRepo = t3lib_div::makeInstance('tx_templavoila_templateRepository');
 				$dsList = $dsRepo->getDatastructuresByStoragePidAndScope($storageFolderPID, tx_templavoila_datastructure::SCOPE_PAGE);
 				foreach($dsList as $dsObj) {
 					if (t3lib_div::inList($disallowedPageTemplateItems, $dsObj->getKey()) ||
@@ -314,9 +328,11 @@ class tx_templavoila_mod1_wizards {
 						}
 
 						$tmpFilename = $toObj->getIcon();
+						$toRow = $toObj->getRow();
 						$previewIconFilename = (@is_file(t3lib_div::getFileAbsFileName(PATH_site . substr($tmpFilename, 3)))) ? ($GLOBALS['BACK_PATH'] . $tmpFilename) : $defaultIcon;
+						$previewIconFilename = @is_file(PATH_site.ltrim($tmpFilename, './')) ? ($GLOBALS['BACK_PATH'] . $tmpFilename) : $previewIconFilename;
 							// Note: we cannot use value of image input element because MSIE replaces this value with mouse coordinates! Thus on click we set value to a hidden field. See http://bugs.typo3.org/view.php?id=3376
-						$previewIcon = '<input type="image" class="c-inputButton" name="i' .$row['uid'] . '" onclick="document.getElementById(\'data_tx_templavoila_to\').value=' . $toObj->getKey() . '" src="'.$previewIconFilename.'" title="" />';
+						$previewIcon = '<input type="image" class="c-inputButton" name="i' .$toRow['uid'] . '" onclick="document.getElementById(\'data_tx_templavoila_to\').value=' . $toObj->getKey() . '" src="'.$previewIconFilename.'" title="" />';
 						$description = $toObj->getDescription() ? htmlspecialchars($toObj->getDescription()) : $LANG->getLL ('template_nodescriptionavailable');
 						$tmplHTML [] = '<table style="width: 100%;" valign="top"><tr><td colspan="2" nowrap="nowrap"><h3 class="bgColor3-20">' . htmlspecialchars($toObj->getLabel()) . '</h3></td></tr>'.
 							'<tr><td valign="top">' . $previewIcon . '</td><td width="120" valign="top"><p>' . $LANG->sL($description) . '</p></td></tr></table>';
