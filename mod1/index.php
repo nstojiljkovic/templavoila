@@ -1165,10 +1165,16 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 			$toRecord = $this->apiObj->getContentTree_fetchPageTemplateObject($this->rootElementRecord);
 		}
 
+		if (!is_array($toRecord)) return '';
+
 		try{
 			$toRepo = t3lib_div::makeInstance('tx_templavoila_templateRepository'); /** @var $toRepo tx_templavoila_templateRepository */
 			$to = $toRepo->getTemplateByUid($toRecord['uid']); /** @var $to tx_templavoila_template */
-			$beTemplate = $to->getBeLayout();
+			if ($to) {
+				$beTemplate = $to->getBeLayout();
+			} else {
+				$beTemplate = false;
+			}
 		} catch (InvalidArgumentException $e) {
 			// might happen if uid was not what the Repo expected - that's ok here
 		}
