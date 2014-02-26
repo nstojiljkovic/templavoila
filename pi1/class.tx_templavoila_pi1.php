@@ -501,17 +501,29 @@ class tx_templavoila_pi1 extends tslib_pibase {
 	/**
 	 * @param array $dataValues
 	 * @param string $vKey
+	 * @param array $fields
 	 * @return array
 	 */
-	protected function getFieldsFromDataValuesForFluid($dataValues, $vKey) {
-		$fields = array();
+	protected function getFieldsFromDataValuesForFluid($dataValues, $vKey, $fields = array()) {
 
 		foreach ($dataValues as $fieldName => $fieldValue) {
 			if (array_key_exists($vKey, $fieldValue)) {
 				$fields[$fieldName] = $fieldValue[$vKey];
 			} elseif (array_key_exists('el', $fieldValue)) {
 				if ($fieldValue['el'] && is_array($fieldValue['el'])) {
-					$fields[$fieldName] = $this->getFieldsFromDataValuesForFluid($fieldValue['el'], $vKey);
+					if(count($fieldValue['el']) > 1) {
+						foreach ($fieldValue['el'] as $fieldNameInternal => $fieldValueInternal) {
+							if (array_key_exists($vKey, $fieldValueInternal)) {
+								$fields[$fieldNameInternal] = $fieldValueInternal[$vKey];
+							}
+							else {
+								$fields[$fieldName][$fieldNameInternal] = $this->getFieldsFromDataValuesForFluid($fieldValueInternal, $vKey);
+							}
+						}
+					}
+					else {
+						$fields[$fieldName] = $this->getFieldsFromDataValuesForFluid($fieldValue['el'], $vKey);
+					}
 				} else {
 					$fields[$fieldName] = $fieldValue['el'];
 				}
@@ -526,10 +538,9 @@ class tx_templavoila_pi1 extends tslib_pibase {
 				}
 			}
 		}
-
 		return $fields;
 	}
-
+	
 	/**
 	 * Performing pre-processing of the data array.
 	 * This will transform the data in the data array according to various rules before the data is merged with the template HTML
