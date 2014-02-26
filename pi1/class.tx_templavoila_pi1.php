@@ -515,6 +515,15 @@ class tx_templavoila_pi1 extends tslib_pibase {
 				} else {
 					$fields[$fieldName] = $fieldValue['el'];
 				}
+			} elseif (is_array($fieldValue)) {
+				foreach ($fieldValue as $fieldNameInternal => $fieldValueInternal) {
+					if (array_key_exists('el', $fieldValueInternal)) {
+						if (!$fields[$fieldName]) {
+							$fields[$fieldName] = array();
+						}
+						$fields[$fieldName][$fieldNameInternal] = $this->getFieldsFromDataValuesForFluid($fieldValueInternal['el'], $vKey);
+					}
+				}
 			}
 		}
 
