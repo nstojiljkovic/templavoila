@@ -1,0 +1,56 @@
+@import url("mod1_default.css");
+
+.t3-row-header .tpm-element-title > a {
+    float: left;
+}
+
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td a {
+    line-height: 17px;
+    height: 17px;
+    font-size: 11px;
+    overflow: hidden;
+    padding-top: 0;
+}
+
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td a,
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.disabled,
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.disabled_over {
+    margin-top: 0px;
+    margin-bottom: 2px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    -moz-border-radius-bottomright: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+}
+
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.disabled,
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.disabled_over {
+    border: 1px solid #adadad;
+    background-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+}
+
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.tabact a,
+.typo3-templavoila-pagemodule #typo3-docbody #tx_templavoila_mod1_sidebar-bar .typo3-dyntabmenu-tabs table.typo3-dyntabmenu td.tabact_over a{
+    border: 1px solid #adadad;
+}
+.typo3-docheader-buttons {
+    padding: 0;
+}
+
+.typo3-templavoila-pagemodule > #typo3-docbody > .typo3-docheader-buttons > .docheader-buttons-inner {
+    margin: 0;
+}
+
+.tpm-container-element-depth-even {
+    background-color: transparent;
+}
+
+div.typo3-dyntabmenu-divs {
+    border: 0;
+}
