@@ -844,9 +844,11 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 		}
 
 			// show sys_notes
-		$sys_notes = recordList::showSysNotesForPage();
-		if ($sys_notes) {
-			$output .= '</div><div>'.$this->doc->section($LANG->sL('LLL:EXT:cms/layout/locallang.xml:internalNotes'), str_replace('sysext/sys_note/ext_icon.gif', $GLOBALS['BACK_PATH'] . 'sysext/sys_note/ext_icon.gif', $sys_notes), 0, 1);
+		if (version_compare(TYPO3_version,'6.0','<')) {
+			$sys_notes = recordList::showSysNotesForPage();
+			if ($sys_notes) {
+				$output .= '</div><div>'.$this->doc->section($LANG->sL('LLL:EXT:cms/layout/locallang.xml:internalNotes'), str_replace('sysext/sys_note/ext_icon.gif', $GLOBALS['BACK_PATH'] . 'sysext/sys_note/ext_icon.gif', $sys_notes), 0, 1);
+			}
 		}
 		return $output;
 	}
