@@ -900,7 +900,7 @@ class tx_templavoila_api {
 		$flexFieldArr = t3lib_div::xml2array($parentRecord['tx_templavoila_flex']);
 		$expandedDataStructure = $this->ds_getExpandedDataStructure ($table, $parentRecord);
 
-		if (is_array ($flexFieldArr['data'])) {
+		if (is_array($flexFieldArr) && array_key_exists('data', $flexFieldArr) && is_array($flexFieldArr['data'])) {
 			foreach ($flexFieldArr['data'] as $sheetKey => $languagesArr) {
 				if (is_array ($languagesArr)) {
 					foreach ($languagesArr as $fieldsArr) {
@@ -949,7 +949,7 @@ class tx_templavoila_api {
 		$flexFieldArr = t3lib_div::xml2array($parentRecord['tx_templavoila_flex']);
 		$expandedDataStructure = $this->ds_getExpandedDataStructure ($table, $parentRecord);
 
-		if (is_array ($flexFieldArr['data'])) {
+		if (is_array($flexFieldArr) && array_key_exists('data', $flexFieldArr) && is_array($flexFieldArr['data'])) {
 			foreach ($flexFieldArr['data'] as $sheetKey => $languagesArr) {
 				if (is_array ($languagesArr)) {
 					foreach ($languagesArr as $languageKey=> $fieldsArr) {
