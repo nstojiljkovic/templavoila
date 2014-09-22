@@ -2613,13 +2613,43 @@ class tx_templavoila_module1 extends t3lib_SCbase {
 
 		if ($id) {
 			$excludeHidden .= ' AND pages_language_overlay.deleted=0';
-			$res = $TYPO3_DB->exec_SELECTquery(
-				'DISTINCT sys_language.*, pages_language_overlay.hidden as PLO_hidden, pages_language_overlay.title as PLO_title',
-				'pages_language_overlay,sys_language',
-				'pages_language_overlay.sys_language_uid=sys_language.uid AND pages_language_overlay.pid='.intval($id).' AND '.$excludeHidden,
-				'',
-				'sys_language.title'
-			);
+			try {
+				$res = $TYPO3_DB->exec_SELECTquery(
+					'DISTINCT sys_language.*, pages_language_overlay.hidden as PLO_hidden, pages_language_overlay.title as PLO_title',
+					'pages_language_overlay,sys_language',
+					'pages_language_overlay.sys_language_uid=sys_language.uid AND pages_language_overlay.pid='.intval($id).' AND '.$excludeHidden,
+					'',
+					'sys_language.title'
+				);
+			} catch (\Exception $e) {
+				// we are catching the exception like this in order to not break projects where ed_scale is not installed
+				if (t3lib_extMgm::isLoaded("ed_scale") && is_a($e, "EssentialDots\\EdScale\\Database\\Exception\\MultipleConnectionsInQueryException")) {
+					$res = $TYPO3_DB->exec_SELECTquery(
+						'pages_language_overlay.sys_language_uid',
+						'pages_language_overlay',
+						'pages_language_overlay.pid='.intval($id).' AND pages_language_overlay.deleted=0',
+						'',
+						''
+					);
+					$sys_language_uids = array();
+					while(TRUE == ($row = $TYPO3_DB->sql_fetch_assoc($res)))	{
+						if (!in_array((int) $row['sys_language_uid'], $sys_language_uids)) {
+							$sys_language_uids[] = (int) $row['sys_language_uid'];
+						}
+					}
+					$res = $TYPO3_DB->exec_SELECTquery(
+						'DISTINCT sys_language.*',
+						'sys_language',
+						count($sys_language_uids) ?
+							'sys_language.uid IN ('.implode(',', $sys_language_uids).')'.($BE_USER->isAdmin() ? ' ' : ' AND sys_language.hidden=0')  . t3lib_BEfunc::deleteClause('sys_language'):
+							'1=0',
+						'',
+						'sys_language.title'
+					);
+				} else {
+					throw $e;
+				}
+			}
 		} else {
 			$res = $TYPO3_DB->exec_SELECTquery(
 				'sys_language.*',
@@ -2935,3 +2965,4 @@ $SOBE->init();
 $SOBE->main();
 $SOBE->printContent();
 ?>
+<pre>x</pre>
