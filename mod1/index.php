@@ -2965,4 +2965,3 @@ $SOBE->init();
 $SOBE->main();
 $SOBE->printContent();
 ?>
-<pre>x</pre>
