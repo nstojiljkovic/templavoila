@@ -274,7 +274,7 @@ class tx_templavoila_pi1 extends tslib_pibase {
 				}
 			}
 
-			$dataValues = is_array($data['data']) ? $data['data'][$sheet][$lKey] : '';
+			$dataValues = (is_array($data) && is_array($data['data'])) ? $data['data'][$sheet][$lKey] : '';
 			if (!is_array($dataValues))	$dataValues = array();
 
 				// Init mark up object.
