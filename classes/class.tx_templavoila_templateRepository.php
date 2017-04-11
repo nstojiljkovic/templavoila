@@ -269,7 +269,7 @@ class tx_templavoila_templateRepository implements t3lib_Singleton {
 			return $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] ? $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_templavoila.']['settings.']['templates.'] : array();
 		} elseif (!$this->tsCache[$pageUid]) {
 			if (t3lib_extMgm::isLoaded('ed_cache')) {
-				$cacheRepository = t3lib_div::makeInstance('Tx_EdCache_Domain_Repository_CacheRepository'); /* @cacheRepository \Tx_EdCache_Domain_Repository_CacheRepository */
+				$cacheRepository = t3lib_div::makeInstance('EssentialDots\\EdCache\\Domain\\Repository\\CacheRepository'); /* @cacheRepository \EssentialDots\EdCache\Domain\Repository\CacheRepository */
 
 				$cacheConf = array(
 					'contentFunc' => array($this, 'loadTSTOSettingsBEImpl'),
