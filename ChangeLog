@@ -1,3 +1,11 @@
+Version: 2.1.0
+Subject: [TASK] Move TCA overrides to Configuration/TCA/Overrides folder
+Date:    2017-04-11 11:57:03 +0200
+Gitweb:  https://gerrit.essentialdots.com/gitweb?p=TYPO3CMS/Extensions/templavoila.git;a=commit;h=1504fec83d2f9b031e77f5eda855c2c8c724687e
+
+Change-Id: I22c0d74afb1a184f90eaf6d9a6b548ce94365eff
+Related: #TP-4284
+
 2011-09-28 Tolleiv Nietsch <tolleiv.nietsch@typo3.org> 
 
 	* Fixed issue: #18291: Section index might be wrong if it's placed after an FCE  (Thanks to Thomas Layh)
