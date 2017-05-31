@@ -1,3 +1,11 @@
+Version: 2.1.1
+Subject: [BUGFIX] Fix tt_content record TCA overrides for templavoila
+Date:    2017-05-31 17:02:28 +0200
+Gitweb:  https://gerrit.essentialdots.com/gitweb?p=TYPO3CMS/Extensions/templavoila.git;a=commit;h=16041407e725099d92a3928a52f35f3135f60e89
+
+Change-Id: Ia51333f123e115e384ec22b234dfbc59070f06cd
+Related: #TP-4350
+
 Version: 2.1.0
 Subject: [TASK] Move TCA overrides to Configuration/TCA/Overrides folder
 Date:    2017-04-11 11:57:03 +0200
