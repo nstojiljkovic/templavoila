@@ -246,7 +246,7 @@ Complex sample using custom viewhelpers:
 ```html
 {namespace fal=EssentialDots\ExtbaseFal\ViewHelpers}
 {namespace er=EssentialDots\EdResponsive\ViewHelpers}
-{namespace h=Tx_ExtbaseHijax_ViewHelpers}
+{namespace h=EssentialDots\ExtbaseHijax\ViewHelpers}
 
 <fal:val.file as="image" fileUid="{field_image}" />
 
