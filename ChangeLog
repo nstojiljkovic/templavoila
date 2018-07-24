@@ -1,3 +1,11 @@
+Version: 2.1.2
+Subject: [TASK] Update extbase_hijax viewhelpers namespace
+Date:    2018-07-24 14:51:42 +0200
+Gitweb:  https://gerrit.essentialdots.com/gitweb?p=TYPO3CMS/Extensions/templavoila.git;a=commit;h=420f45a99039bdeb0e6242ce447159e6b566c300
+
+Change-Id: Ia2c6a480a6a35755c0804b70a0887094133ea4fa
+Related: #TP-4735
+
 Version: 2.1.1
 Subject: [BUGFIX] Fix tt_content record TCA overrides for templavoila
 Date:    2017-05-31 17:02:28 +0200
